@@ -1,12 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setCredentials, logOut } from "./features/auth/authSlice";
-import {
-    useGetUserMutation,
-    useRefreshAccessTokenMutation,
-} from "./features/auth/authApiSlice";
-
 import {
     Home,
     Subscriptions,
@@ -23,11 +16,6 @@ import ProfileHome from "./components/ProfileHome";
 import usePersistLogin from "./hooks/usePersistLogin";
 
 function App() {
-    const dispatch = useDispatch();
-    const { token } = useSelector((state) => state.auth);
-    const [refreshAccessToken] = useRefreshAccessTokenMutation();
-    const [getUser] = useGetUserMutation();
-
     const persistLoaded = usePersistLogin();
 
     if (!persistLoaded) {
