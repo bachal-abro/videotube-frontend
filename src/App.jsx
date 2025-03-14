@@ -14,6 +14,7 @@ import Login from "./pages/Login";
 import RequireAuth from "./features/auth/RequireAuth";
 import ProfileHome from "./components/ProfileHome";
 import usePersistLogin from "./hooks/usePersistLogin";
+import LogoutButton from "./components/ui/LogoutButton";
 
 function App() {
     const persistLoaded = usePersistLogin();
@@ -35,6 +36,7 @@ function App() {
                     </Route>
                     <Route path="subscriptions" element={<Subscriptions />} />
                     <Route path="settings" element={<Settings />} />
+                    <Route path="logout" element={<LogoutButton />} />
                 </Route>
             </Route>
         </Routes>
