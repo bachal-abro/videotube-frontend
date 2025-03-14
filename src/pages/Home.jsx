@@ -1,7 +1,5 @@
 import React from "react";
 import HomeFeed from "../components/HomeFeed";
-import Fetching from "../services/api/Fetching";
-import Spinner from "../components/Spinner";
 import { useSelector } from "react-redux";
 import CategoryNavigation from "../components/CategoryNavigation";
 
@@ -35,7 +33,7 @@ const Home = () => {
       <div className="h-12"></div>
       <CategoryNavigation>{categoryItems}</CategoryNavigation>
       {/* <Fetching/> */}
-      <HomeFeed />
+      {/* <HomeFeed /> */}
       {/* {fetchStatus.currentlyFetching ? <Spinner/>: <HomeFeed />} */}
     </div>
   );

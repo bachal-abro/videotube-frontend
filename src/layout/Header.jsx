@@ -4,11 +4,17 @@ import { FiSearch } from "react-icons/fi";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { Link, NavLink } from "react-router-dom";
-import { login } from "../services/api/AuthApi";
+import { login } from "../services/api/AuthApi.js";
+import LogoutButton from "../components/ui/LogoutButton.jsx";
+import { useSelector } from "react-redux";
 const Header = () => {
     const uploadDropdown = useRef();
     const profileDropdown = useRef();
+    const { user, token } = useSelector((store) => store.auth);
+    // console.log(user);
 
+    // console.log(token);
+    
     // Todo: Implement
     const navItems = [
         {
@@ -58,14 +64,8 @@ const Header = () => {
                                 <FiSearch className="text-black dark:text-white" />
                             </button>
                         </div>
-                        <button
-                            onClick={ async () => {
-                                const response = await login();
-                                console.log(response);
-                            }}
-                        >
-                            Login
-                        </button>
+                        <h1 className="text-white">{user?.username}</h1>
+                        {/* <LogoutButton /> */}
                         <div className="absolute inset-y-0 right-0 gap-2 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                             <div className="relative">
                                 <IoCloudUploadOutline
