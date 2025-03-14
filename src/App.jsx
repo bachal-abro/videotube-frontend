@@ -20,6 +20,7 @@ import Layout from "./layout/Layout";
 import Login from "./pages/Login";
 import RequireAuth from "./features/auth/RequireAuth";
 import ProfileHome from "./components/ProfileHome";
+import usePersistLogin from "./hooks/usePersistLogin";
 
 function App() {
     const dispatch = useDispatch();
@@ -27,40 +28,11 @@ function App() {
     const [refreshAccessToken] = useRefreshAccessTokenMutation();
     const [getUser] = useGetUserMutation();
 
-    useEffect(() => {
-        // If no access token is found in Redux state, attempt to refresh it.
-        if (!token) {
-            refreshAccessToken()
-                .unwrap()
-                .then((data) => {
-                    // Store the token using the key "token"
-                    dispatch(setCredentials({ token: data.data.accessToken }));
-                    getUser()
-                        .unwrap()
-                        .then((userData) => {
-                            console.log(
-                                "New access token:",
-                                data.data.accessToken
-                            );
+    const persistLoaded = usePersistLogin();
 
-                            dispatch(
-                                setCredentials({
-                                    token: data.data.accessToken,
-                                    user: userData.data,
-                                })
-                            );
-                        })
-                        .catch((error) => {
-                            console.error("Failed to fetch user info:", error);
-                            dispatch(logOut());
-                        });
-                })
-                .catch((err) => {
-                    console.error("Token refresh failed:", err);
-                    dispatch(logOut());
-                });
-        }
-    }, [token, dispatch, refreshAccessToken, getUser]);
+    if (!persistLoaded) {
+        return <div>Loading...</div>; // Show loader until auth check completes
+    }
 
     return (
         <Routes>
