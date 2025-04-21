@@ -31,7 +31,7 @@ const Login = () => {
             dispatch(
                 setCredentials({
                     token: userData.data.accessToken,
-                    token: userData.data.user,
+                    user: userData.data.user,
                 })
             );
             setUsername("");
