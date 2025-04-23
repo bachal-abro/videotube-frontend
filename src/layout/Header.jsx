@@ -4,7 +4,6 @@ import { FiSearch } from "react-icons/fi";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { Link, NavLink } from "react-router-dom";
-import { login } from "../services/api/AuthApi.js";
 import LogoutButton from "../components/ui/LogoutButton.jsx";
 import { useSelector } from "react-redux";
 const Header = () => {

@@ -2,7 +2,9 @@ import React from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import SeparaterHr from "../components/SeparaterHr";
 import CategoryNavigation from "../components/CategoryNavigation";
+import { useSelector } from "react-redux";
 const Profile = () => {
+  const { user, token } = useSelector((store) => store.auth);
   const categoryItems = [
     {
       name: "Home",
@@ -41,7 +43,7 @@ const Profile = () => {
               <h1 className="text-white text-xl sm:text-4xl font-bold">
                 Demo User
               </h1>
-              <p className="text-sm">@demo-user</p>
+              <p className="text-sm">@{user.username}</p>
               <p className="text-sm">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Culpa,
                 nostrum quae? Tenetur, odit facere! Tempore architecto error
