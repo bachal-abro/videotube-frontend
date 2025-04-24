@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
     Home,
+    VideoView,
     Subscriptions,
     Profile,
     History,
@@ -37,6 +38,9 @@ function App() {
                     <Route path="subscriptions" element={<Subscriptions />} />
                     <Route path="settings" element={<Settings />} />
                     <Route path="logout" element={<LogoutButton />} />
+
+                    {/* Videos */}
+                    <Route path="videos/:videoId" element={<VideoView/>} />
                 </Route>
             </Route>
         </Routes>
