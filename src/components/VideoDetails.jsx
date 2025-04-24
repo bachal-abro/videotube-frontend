@@ -5,10 +5,8 @@ import SubscriptionButtons from "./SubscriptionButtons";
 import VideoButtons from "./VideoButtons";
 import VideoDescription from "./VideoDescription";
 import SeparaterHr from "./SeparaterHr";
-import { useSelector } from "react-redux";
-const VideoDetails = () => {
-  const { video } = useSelector((store) => store.videoView);
-  
+
+const VideoDetails = ({ video }) => {
   return (
     <>
       <div className="w-full">
@@ -30,16 +28,16 @@ const VideoDetails = () => {
                 {video.views}
               </span>
             </div>
-            <VideoButtons />
+            <VideoButtons video={video} />
           </div>
         </div>
         <SeparaterHr />
         <div className="sm:flex justify-between px-2 sm:px-2">
-          <ProfileCard />
-          <SubscriptionButtons />
+          <ProfileCard video={video} />
+          <SubscriptionButtons video={video} />
         </div>
       </div>
-      <VideoDescription />
+      <VideoDescription video={video} />
     </>
   );
 };

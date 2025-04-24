@@ -33,7 +33,7 @@ const Home = () => {
       <div className="h-12"></div>
       <CategoryNavigation>{categoryItems}</CategoryNavigation>
       {/* <Fetching/> */}
-      {/* <HomeFeed /> */}
+      <HomeFeed />
       {/* {fetchStatus.currentlyFetching ? <Spinner/>: <HomeFeed />} */}
     </div>
   );

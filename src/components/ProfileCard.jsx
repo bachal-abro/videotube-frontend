@@ -1,8 +1,8 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
-const ProfileCard = () => {
-  const { video } = useSelector((store) => store.videoView);
+const ProfileCard = ({ video}) => {
+  // const { video } = useSelector((store) => store.videoView);
   const creator = video?.owner
   
   return (

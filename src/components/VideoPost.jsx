@@ -5,7 +5,6 @@ const VideoPost = ({ video }) => {
   
   return (
     <Link to={`/videos/${video._id}`}>
-
       {/* //? IDEA: Show views on Thumbnail and remove img tag and set cover of video as thumbnail */}
       <div className="aspect-video">
         <img

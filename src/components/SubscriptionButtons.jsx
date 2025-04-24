@@ -1,8 +1,8 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
-const SubscriptionButtons = () => {
-  const { video } = useSelector((store) => store.videoView);
+const SubscriptionButtons = ({video}) => {
+  // const { video } = useSelector((store) => store.videoView);
   return (
     <div className="flex flex-col">
       <div className="flex flex-col text-center mt-2">

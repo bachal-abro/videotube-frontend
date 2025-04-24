@@ -9,8 +9,8 @@ import { TbShare3 } from "react-icons/tb";
 import { MdDownload } from "react-icons/md";
 import { useSelector } from "react-redux";
 import LikeButton from "./ui/LikeButton";
-const VideoButtons = () => {
-  const { video } = useSelector((store) => store.videoView);
+const VideoButtons = ({ video }) => {
+  // const { video } = useSelector((store) => store.videoView);
 
   return (
     <div className="flex justify-between sm:justify-normal sm:gap-8 items-center">

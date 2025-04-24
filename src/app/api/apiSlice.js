@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { setCredentials, logOut } from "../../features/auth/authSlice";
 
 const baseQuery = fetchBaseQuery({
-    baseUrl: "http://localhost:8000/api/v1/users", // adjust as needed
+    baseUrl: "http://localhost:8000/api/v1", // adjust as needed
     credentials: "include", // ensure cookies (for refresh token) are sent
     prepareHeaders: (headers, { getState }) => {
         const token = getState().auth.token;
@@ -21,7 +21,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
         console.log("Access token expired. Attempting to refresh...");
         // Attempt to refresh the access token
         const refreshResult = await baseQuery(
-            { url: "/refresh-token", method: "POST" },
+            { url: "/users/refresh-token", method: "POST" },
             api,
             extraOptions
         );
