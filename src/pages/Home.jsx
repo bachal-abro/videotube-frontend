@@ -35,12 +35,12 @@ const Home = () => {
 
     const { data, isLoading, isSuccess, isError, error } =
         useGetAllVideosQuery();
-        useEffect(() => {
-          if (isSuccess && data?.data) {
+    useEffect(() => {
+        if (isSuccess && data?.data) {
             dispatch(setVideoFeed(data.data));
-          }
-        }, [isSuccess, data, dispatch]);
-        
+        }
+    }, [isSuccess, data, dispatch]);
+
     let content;
     if (isLoading) {
         content = <p>"Loading..."</p>;

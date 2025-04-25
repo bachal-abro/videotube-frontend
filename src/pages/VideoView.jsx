@@ -8,12 +8,12 @@ import { useGetVideoByIdQuery } from "../features/videos/videosApiSlice";
 
 const VideoView = () => {
     const { videoId } = useParams();
-    const { data: video, isLoading, isSuccess, isError, error, isFetching } = useGetVideoByIdQuery(videoId);
-    if (isFetching) {
+    const { data, isLoading, isSuccess, isError, error } = useGetVideoByIdQuery(videoId);
+    if (isLoading) {
         return <p>"Loading..."</p>;
     } else if (isSuccess) {
             return <div className="w-ful text-white">
-                <VideoDetails video={video.data} />
+                <VideoDetails video={data.data} />
                 <SeparaterHr />
                 {/* <CommentSection videoId={videoId} /> */}
             </div>
