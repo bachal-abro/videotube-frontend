@@ -1,19 +1,22 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { useGetUserByIdQuery } from "../features/users/usersApiSlice";
-useGetUserByIdQuery;
+import { useGetSubscribersQuery } from "../features/subscription/subscriptionApiSlice";
 
 const ProfileCard = ({ video }) => {
     // const { video } = useSelector((store) => store.videoView);
     const ownerId = video?.owner;
-    const { data, isLoading, isSuccess, isError, error } =
+    const { data:channel, isLoading: isChannelLoading, isSuccess:isChannelSuccess, isChannelError, channelError } =
         useGetUserByIdQuery(ownerId);
 
-    if (isLoading) {
+    const { data:subscription, isLoading: isSubscriptionLoading, isSuccess:isSubscriptionSuccess } =
+    useGetSubscribersQuery(ownerId);
+        
+    if (isChannelLoading) {
         return <p>"Loading..."</p>;
-    } else if (isSuccess) {
-        const creator = data.data;
-
+    } else if (isChannelSuccess) {
+        const creator = channel.data;
+      
         return (
             <div className="flex items-center gap-4">
                 <img
@@ -23,7 +26,7 @@ const ProfileCard = ({ video }) => {
                 />
                 <div className="flex flex-col">
                     <h1 className="font-medium">{creator?.fullName}</h1>
-                    {/* <p className="text-sm text-gray-300">{creator?.subscribers} Subscribers</p> */}
+                    <p className="text-sm text-gray-300">{subscription?.pagination.subscribersCount} Subscribers</p>
                 </div>
             </div>
         );
