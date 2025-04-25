@@ -24,11 +24,11 @@ const VideoPost = ({ video }) => {
                     {/* Owner image */}
                     <img
                         className="h-8 w-8 rounded-full sm:block"
-                        src={video.owner.avatar}
+                        src={video.ownerAvatar}
                         alt="Video thumbnail"
                     />
                     <div className="flex flex-col gap-0">
-                        <p className="text-sm">{video.owner.fullName}</p>
+                        <p className="text-sm">{video.ownerName}</p>
                         <p className="text-sm -mt-1">{video.createdAt}</p>
                     </div>
                 </div>
