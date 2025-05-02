@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import SeparaterHr from "../components/SeparaterHr";
-// import CommentSection from "../components/CommentSection";
+import CommentSection from "../components/CommentSection";
 import VideoDetails from "../components/VideoDetails";
 import { useGetVideoByIdQuery } from "../features/videos/videosApiSlice";
 import { useDispatch } from "react-redux";
@@ -24,7 +24,7 @@ const VideoView = () => {
             return <div className="w-ful text-white">
                 <VideoDetails/>
                 <SeparaterHr />
-                {/* <CommentSection videoId={videoId} /> */}
+                <CommentSection videoId={videoId} />
             </div>
     
     } else if (isError) {

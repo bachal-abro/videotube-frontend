@@ -5,8 +5,6 @@ const videoSlice = createSlice({
     initialState: {
         currentVideo: {},
         videoFeed: [],
-        currentVideoOwner: {},
-        currentVideoOwnerSubscription: {},
     },
     reducers: {
         setVideoFeed: (state, action) => {
@@ -16,15 +14,9 @@ const videoSlice = createSlice({
         setCurrentVideo: (state, action) => {
             state.currentVideo = action.payload;
         },
-        setCurrentVideoOwner: (state, action) => {
-            state.currentVideoOwner = action.payload;
-        },
-        setCurrentVideoOwnerSubscription: (state, action) => {
-            state.currentVideoOwnerSubscription = action.payload;
-        },
     },
 });
 
-export const { setVideoFeed, setCurrentVideo, setCurrentVideoOwner, setCurrentVideoOwnerSubscription } =
+export const { setVideoFeed, setCurrentVideo } =
     videoSlice.actions;
 export default videoSlice.reducer;

@@ -1,7 +1,6 @@
 import React from "react";
 import NewComment from "./NewComment";
 import NewCommentSM from "./NewCommentSM";
-import FetchComments from "../services/api/fetchComments";
 import Comment from "./Comment";
 import { useDispatch, useSelector } from "react-redux";
 
