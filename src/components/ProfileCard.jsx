@@ -1,22 +1,36 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useGetUserByIdQuery } from "../features/users/usersApiSlice";
-import { useGetSubscribersQuery } from "../features/subscription/subscriptionApiSlice";
+import { setCurrentVideoOwner } from "../features/videos/videoSlice";
 
-const ProfileCard = ({ video }) => {
-    // const { video } = useSelector((store) => store.videoView);
-    const ownerId = video?.owner;
-    const { data:channel, isLoading: isChannelLoading, isSuccess:isChannelSuccess, isChannelError, channelError } =
-        useGetUserByIdQuery(ownerId);
+const ProfileCard = () => {
+    const subscription = useSelector(
+        (store) => store.video.currentVideoOwnerSubscription
+    );
 
-    const { data:subscription, isLoading: isSubscriptionLoading, isSuccess:isSubscriptionSuccess } =
-    useGetSubscribersQuery(ownerId);
-        
-    if (isChannelLoading) {
+    const dispatch = useDispatch();
+    const currentVideoOwner = useSelector(
+        (store) => store.video.currentVideoOwner
+    );
+
+    const currentVideo = useSelector((store) => store.video.currentVideo);
+    const { data, isLoading, isSuccess, isError } = useGetUserByIdQuery(
+        currentVideo?.owner
+    );
+
+    useEffect(() => {
+        if (data && isSuccess) {
+            dispatch(
+                setCurrentVideoOwner({
+                    ...data?.data,
+                })
+            );
+        }
+    }, [data, isSuccess, subscription]);
+    if (isLoading) {
         return <p>"Loading..."</p>;
-    } else if (isChannelSuccess) {
-        const creator = channel.data;
-      
+    } else if (isSuccess) {
+        const creator = currentVideoOwner;
         return (
             <div className="flex items-center gap-4">
                 <img
@@ -26,7 +40,9 @@ const ProfileCard = ({ video }) => {
                 />
                 <div className="flex flex-col">
                     <h1 className="font-medium">{creator?.fullName}</h1>
-                    <p className="text-sm text-gray-300">{subscription?.pagination.subscribersCount} Subscribers</p>
+                    <p className="text-sm text-gray-300">
+                        {subscription?.subscriberCount} Subscribers
+                    </p>
                 </div>
             </div>
         );

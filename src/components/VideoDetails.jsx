@@ -1,45 +1,70 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { IoCalendarOutline, IoEyeOutline } from "react-icons/io5";
 import ProfileCard from "./ProfileCard";
 import SubscriptionButtons from "./SubscriptionButtons";
 import VideoButtons from "./VideoButtons";
 import VideoDescription from "./VideoDescription";
 import SeparaterHr from "./SeparaterHr";
+import { useGetSubscriptionStatusQuery } from "../features/subscription/subscriptionApiSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setCurrentVideoOwnerSubscription } from "../features/videos/videoSlice";
 
-const VideoDetails = ({ video }) => {
-  return (
-    <>
-      <div className="w-full">
-        <video
-          className="h-[40vh] sm:h-[70vh] bg-gray-900 w-full rounded-lg"
-          controls
-        >
-          <source src={video.videoFile} type="video/mp4" />
-        </video>
-        <div className="flex flex-col mt-2 px-2">
-          <h1 className="text-xl font-bold">{video.title}</h1>
-          <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0 mt-2 sm:mt-4 -mb-3 sm:pr-4">
-            <div className="flex items-end gap-4 text-gray-300 text-sm">
-              <span className="flex gap-1 items-center">
-                <IoCalendarOutline className="text-lg" /> {video.createdAt}
-              </span>
-              <span className="flex gap-1 items-center">
-                <IoEyeOutline className="text-lg" />
-                {video.views}
-              </span>
+const VideoDetails = () => {
+    const dispatch = useDispatch();
+    const video = useSelector((store) => store.video);
+    const currentVideo = video.currentVideo;
+    const { data: subscription, isSuccess } = useGetSubscriptionStatusQuery(
+        currentVideo?.owner
+    );
+    const isSubscribed = subscription?.data.isSubscribed ?? 0;
+    const subscriberCount = subscription?.data.subscribersCount;
+
+    useEffect(() => {
+        if (subscription && isSuccess) {
+            dispatch(
+                setCurrentVideoOwnerSubscription({
+                    subscriberCount,
+                    isSubscribed,
+                })
+            );
+        }
+    }, [subscription]);
+
+    
+    return (
+        <>
+            <div className="w-full">
+                <video
+                    className="h-[40vh] sm:h-[70vh] bg-gray-900 w-full rounded-lg"
+                    controls
+                >
+                    <source src={currentVideo?.videoFile} type="video/mp4" />
+                </video>
+                <div className="flex flex-col mt-2 px-2">
+                    <h1 className="text-xl font-bold">{currentVideo?.title}</h1>
+                    <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0 mt-2 sm:mt-4 -mb-3 sm:pr-4">
+                        <div className="flex items-end gap-4 text-gray-300 text-sm">
+                            <span className="flex gap-1 items-center">
+                                <IoCalendarOutline className="text-lg" />{" "}
+                                {currentVideo?.createdAt}
+                            </span>
+                            <span className="flex gap-1 items-center">
+                                <IoEyeOutline className="text-lg" />
+                                {currentVideo?.views}
+                            </span>
+                        </div>
+                        {/* <VideoButtons video={video} /> */}
+                    </div>
+                </div>
+                <SeparaterHr />
+                <div className="sm:flex justify-between px-2 sm:px-2">
+                    <ProfileCard video={video} />
+                    <SubscriptionButtons video={video} />
+                </div>
             </div>
-            <VideoButtons video={video} />
-          </div>
-        </div>
-        <SeparaterHr />
-        <div className="sm:flex justify-between px-2 sm:px-2">
-          <ProfileCard video={video} />
-          <SubscriptionButtons video={video} />
-        </div>
-      </div>
-      <VideoDescription video={video} />
-    </>
-  );
+            {/* <VideoDescription video={video} /> */}
+        </>
+    );
 };
 
 export default VideoDetails;

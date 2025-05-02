@@ -1,8 +1,13 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, current } from "@reduxjs/toolkit";
 
 const videoSlice = createSlice({
     name: "video",
-    initialState: { currentVideo: {}, videoFeed: [] },
+    initialState: {
+        currentVideo: {},
+        videoFeed: [],
+        currentVideoOwner: {},
+        currentVideoOwnerSubscription: {},
+    },
     reducers: {
         setVideoFeed: (state, action) => {
             // If user is provided, update it; otherwise, keep the existing user
@@ -11,11 +16,15 @@ const videoSlice = createSlice({
         setCurrentVideo: (state, action) => {
             state.currentVideo = action.payload;
         },
+        setCurrentVideoOwner: (state, action) => {
+            state.currentVideoOwner = action.payload;
+        },
+        setCurrentVideoOwnerSubscription: (state, action) => {
+            state.currentVideoOwnerSubscription = action.payload;
+        },
     },
 });
 
-export const { setVideoFeed, setCurrentVideo } = videoSlice.actions;
+export const { setVideoFeed, setCurrentVideo, setCurrentVideoOwner, setCurrentVideoOwnerSubscription } =
+    videoSlice.actions;
 export default videoSlice.reducer;
-
-// export const selectCurrentUser = (state) => state.auth.user;
-// export const selectCurrentToken = (state) => state.auth.token;
