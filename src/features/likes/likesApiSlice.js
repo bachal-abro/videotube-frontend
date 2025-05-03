@@ -8,12 +8,15 @@ export const likesApiSlice = apiSlice.injectEndpoints({
                 method: "POST",
             }),
         }),
+        toggleCommentLike: builder.mutation({
+            query: (commentId) => ({
+                url: `likes/toggle/c/${commentId}`,
+                method: "POST",
+            }),
+        }),
+        
     }),
 });
 
-export const {
-    useGetSubscribersQuery,
-    useGetSubscribedChannelsQuery,
-    useToggleVideoLikeMutation,
-    useGetSubscriptionStatusQuery,
-} = likesApiSlice;
+export const { useToggleVideoLikeMutation, useToggleCommentLikeMutation } =
+    likesApiSlice;
