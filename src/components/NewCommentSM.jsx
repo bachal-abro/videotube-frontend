@@ -15,13 +15,13 @@ const NewCommentSM = ({id, className}) => {
 
     const [createVideoComment, { isLoading, isSuccess, isError, error }] =
         useCreateVideoCommentMutation();
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const newComment = await createVideoComment({
                 videoId,
                 content,
+                parentCommentId: id
             }).unwrap();
             console.log(newComment);
             // Todo: Adjust in backend to make it work:
@@ -29,6 +29,7 @@ const NewCommentSM = ({id, className}) => {
                 _id: newComment?.data._id,
                 content: newComment?.data?.content,
                 video: newComment?.data?.video,
+                parentComment: id,
                 owner: {
                     _id: user?._id,
                     username: user?.username,

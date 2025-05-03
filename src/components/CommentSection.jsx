@@ -8,7 +8,6 @@ import { useParams } from "react-router-dom";
 import { setCurrentVideoComments } from "../features/comments/commentSlice";
 
 const CommentSection = () => {
-    
     const { videoId } = useParams();
     const dispatch = useDispatch();
     const commentsList = useSelector(
@@ -36,9 +35,13 @@ const CommentSection = () => {
             </span>
 
             <div className="flex flex-col gap-4">
-                {commentsList.map((comment) => (
-                    <Comment key={comment._id} comment={comment} />
-                ))}
+                {commentsList.map((comment) =>
+                    comment.parentComment ? (
+                        ""
+                    ) : (
+                        <Comment key={comment._id} comment={comment} />
+                    )
+                )}
             </div>
         </div>
     );

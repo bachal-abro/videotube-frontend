@@ -13,10 +13,10 @@ export const videoCommentsApiSlice = apiSlice.injectEndpoints({
             }),
         }),
         createVideoComment: builder.mutation({
-            query: ({ videoId, content }) => ({
+            query: ({ videoId, content, parentCommentId }) => ({
                 url: `/comments/${videoId}`,
                 method: "POST",
-                body: { content },
+                body: { content, parentCommentId },
             }),
         }),
 

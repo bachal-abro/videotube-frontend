@@ -28,6 +28,7 @@ const NewComment = () => {
                 _id: newComment?.data._id,
                 content: newComment?.data?.content,
                 video: newComment?.data?.video,
+                parentComment: null,
                 owner: {
                     _id: user?._id,
                     username: user?.username,
@@ -40,6 +41,7 @@ const NewComment = () => {
                 likes: 0,
                 isLiked: false,
             };
+            
             dispatch(setCurrentVideoComments([...commentsList, newObj]));
             setContent(""); // clear input
         } catch (isError) {
