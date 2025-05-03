@@ -24,7 +24,7 @@ const VideoView = () => {
             return <div className="w-ful text-white">
                 <VideoDetails/>
                 <SeparaterHr />
-                <CommentSection videoId={videoId} />
+                <CommentSection />
             </div>
     
     } else if (isError) {
