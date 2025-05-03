@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     AiFillDislike,
     AiFillLike,
@@ -11,6 +11,7 @@ import { timeAgo } from "../utils/timeAgo";
 import { useDispatch, useSelector } from "react-redux";
 import { useToggleCommentLikeMutation } from "../features/likes/likesApiSlice";
 import { setCurrentVideoComments } from "../features/comments/commentSlice";
+import NewCommentSM from "./NewCommentSM";
 
 const Comment = ({ comment }) => {
     const commentsList = useSelector(
@@ -18,6 +19,7 @@ const Comment = ({ comment }) => {
     );
     const user = useSelector((store) => store.auth.user);
     const dispatch = useDispatch();
+    const [show, setShow] = useState(false)
     const [toggleCommentLike, { isSuccess }] = useToggleCommentLikeMutation();
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -53,53 +55,65 @@ const Comment = ({ comment }) => {
         }
     };
 
+    const onReply = () =>{
+        setShow(true)
+    }
+
     return (
-        <div className="flex gap-3 items-start px-1 pb-4">
-            <img
-                className="h-10 w-10 rounded-full sm:block"
-                src={comment?.owner?.avatar}
-                alt=""
-            />
-            <div>
-                <div className="flex gap-2">
-                    <Link
-                        to={`/@${comment?.owner?.username}`}
-                        className="text-sm font-medium text-blue-400"
-                    >
-                        {comment?.owner?.username}
-                    </Link>
-                    <p className="text-sm text-gray-400">
-                        {timeAgo(comment?.createdAt)}
-                    </p>
-                </div>
-                <h2 className="text-sm sm:text-md">{comment?.content}</h2>
-                <div className="flex gap-4 text-sm sm:text-md">
-                    {/* // Todo: Make button components */}
-                    <button
-                        type="button"
-                        className="flex gap-1 justify-center items-center rounded-full text-black font-medium dark:text-gray-400 border-gray-200 dark:hover:text-blue-400"
-                    >
-                        <MdOutlineQuickreply />
-                        Reply
-                    </button>
-                    <button
-                        type="button"
-                        onClick={(e) => handleSubmit(e)}
-                        className="flex gap-1 justify-center items-center rounded-full text-black font-medium dark:text-gray-400 border-gray-200 dark:hover:text-blue-400"
-                    >
-                        {comment?.isLiked ? <AiFillLike /> : <AiOutlineLike />}
-                        {comment?.likes}
-                    </button>
-                    <button
+        <div className="pb-2">
+            <div className="flex gap-3 items-start px-1 pb-2">
+                <img
+                    className="h-10 w-10 rounded-full sm:block"
+                    src={comment?.owner?.avatar}
+                    alt=""
+                />
+                <div>
+                    <div className="flex gap-2">
+                        <Link
+                            to={`/@${comment?.owner?.username}`}
+                            className="text-sm font-medium text-blue-400"
+                        >
+                            {comment?.owner?.username}
+                        </Link>
+                        <p className="text-sm text-gray-400">
+                            {timeAgo(comment?.createdAt)}
+                        </p>
+                    </div>
+                    <h2 className="text-sm sm:text-md">{comment?.content}</h2>
+                    <div className="flex gap-4 text-sm sm:text-md">
+                        {/* // Todo: Make button components */}
+                        <button
+                            type="button"
+                            onClick={onReply}
+                            className="flex gap-1 justify-center items-center rounded-full text-black font-medium dark:text-gray-400 border-gray-200 dark:hover:text-blue-400"
+                        >
+                            <MdOutlineQuickreply />
+                            Reply
+                        </button>
+                        <button
+                            type="button"
+                            onClick={(e) => handleSubmit(e)}
+                            className="flex gap-1 justify-center items-center rounded-full text-black font-medium dark:text-gray-400 border-gray-200 dark:hover:text-blue-400"
+                        >
+                            {comment?.isLiked ? (
+                                <AiFillLike />
+                            ) : (
+                                <AiOutlineLike />
+                            )}
+                            {comment?.likes}
+                        </button>
+                        {/* <button
                         type="button"
                         className="flex gap-1 justify-center items-center rounded-full text-black font-medium dark:text-gray-400 border-gray-200 dark:hover:text-blue-400"
                     >
                         <AiOutlineDislike />
                         <AiFillDislike className="hidden" />
                         50
-                    </button>
+                    </button> */}
+                    </div>
                 </div>
             </div>
+            <NewCommentSM id={comment?._id} className={show?"":`hidden`}/>
         </div>
     );
 };

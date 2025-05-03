@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useCreateVideoCommentMutation } from "../features/comments/videoCommentsApiSlice";
 import { setCurrentVideoComments } from "../features/comments/commentSlice";
 
-const NewCommentSM = () => {
+const NewCommentSM = ({id, className}) => {
     const { videoId } = useParams();
     const [content, setContent] = useState("");
     const user = useSelector((store) => store.auth.user);
@@ -48,7 +48,7 @@ const NewCommentSM = () => {
         }
     };
     return (
-        <form method="POST" onSubmit={(e)=> handleSubmit(e)}>
+        <form method="POST" id={id}  onSubmit={(e)=> handleSubmit(e)} className={`${className}`}>
             <label htmlFor="userComment" className="sr-only"></label>
             <div className="flex items-center rounded-lg bg-gray-50 dark:bg-gray-800 mx-1">
                 <textarea
