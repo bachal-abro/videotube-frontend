@@ -8,8 +8,51 @@ import {
 import { MdOutlineQuickreply } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { timeAgo } from "../utils/timeAgo";
+import { useDispatch, useSelector } from "react-redux";
+import { useToggleCommentLikeMutation } from "../features/likes/likesApiSlice";
+import { setCurrentVideoComments } from "../features/comments/commentSlice";
 
 const Comment = ({ comment }) => {
+    const commentsList = useSelector(
+        (store) => store.comments.currentVideoComments
+    );
+    const user = useSelector((store) => store.auth.user);
+    const dispatch = useDispatch();
+    const [toggleCommentLike, { isSuccess }] = useToggleCommentLikeMutation();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const updatedLike = await toggleCommentLike(comment?._id).unwrap();
+            const newObj = {
+                _id: comment?._id,
+                content: comment?.content,
+                video: comment?.video,
+                owner: {
+                    _id: user?._id,
+                    username: user?.username,
+                    fullName: user?.fullName,
+                    avatar: user?.avatar,
+                },
+                createdAt: comment?.createdAt,
+                updatedAt: comment?.updatedAt,
+                __v: 0,
+                likes: updatedLike?.data?.likes,
+                isLiked: updatedLike?.data?.isLiked,
+            };
+
+            const index = commentsList.findIndex((c) => c._id === newObj._id);
+            const updatedComments =
+                index !== -1
+                    ? commentsList.map((c) =>
+                          c._id === newObj._id ? newObj : c
+                      )
+                    : [...commentsList, newObj];
+            dispatch(setCurrentVideoComments(updatedComments));
+        } catch (error) {
+            console.error("Failed to toggle like:", error);
+        }
+    };
+
     return (
         <div className="flex gap-3 items-start px-1 pb-4">
             <img
@@ -41,11 +84,11 @@ const Comment = ({ comment }) => {
                     </button>
                     <button
                         type="button"
+                        onClick={(e) => handleSubmit(e)}
                         className="flex gap-1 justify-center items-center rounded-full text-black font-medium dark:text-gray-400 border-gray-200 dark:hover:text-blue-400"
                     >
-                        <AiOutlineLike />
-                        <AiFillLike className="hidden" />
-                        10k
+                        {comment?.isLiked ? <AiFillLike /> : <AiOutlineLike />}
+                        {comment?.likes}
                     </button>
                     <button
                         type="button"
