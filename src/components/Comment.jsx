@@ -13,14 +13,20 @@ import { useToggleCommentLikeMutation } from "../features/likes/likesApiSlice";
 import { setCurrentVideoComments } from "../features/comments/commentSlice";
 import NewCommentSM from "./NewCommentSM";
 
-const Comment = ({ comment }) => {
+const Comment = ({ comment, hasParent }) => {
     const commentsList = useSelector(
         (store) => store.comments.currentVideoComments
     );
     const user = useSelector((store) => store.auth.user);
     const dispatch = useDispatch();
-    const [show, setShow] = useState(false)
+    const [showReplyInput, setShowReplyInput] = useState(false);
+    const [showReplies, setShowReplies] = useState(false);
     const [toggleCommentLike, { isSuccess }] = useToggleCommentLikeMutation();
+
+    const replies = commentsList.filter((c) => {
+        return c.parentComment == comment._id;
+    });
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -29,6 +35,7 @@ const Comment = ({ comment }) => {
                 _id: comment?._id,
                 content: comment?.content,
                 video: comment?.video,
+                parentComment: comment?.parentComment,
                 owner: {
                     _id: user?._id,
                     username: user?.username,
@@ -55,12 +62,16 @@ const Comment = ({ comment }) => {
         }
     };
 
-    const onReply = () =>{
-        setShow(true)
-    }
+    const onReply = () => {
+        setShowReplyInput(true);
+    };
+
+    const HandleShowReplies = () => {
+        setShowReplies((prev) => !prev);
+    };
 
     return (
-        <div className="pb-2">
+        <div className={hasParent ? " pl-10" : "pb-2"}>
             <div className="flex gap-3 items-start px-1 pb-2">
                 <img
                     className="h-10 w-10 rounded-full sm:block"
@@ -113,7 +124,32 @@ const Comment = ({ comment }) => {
                     </div>
                 </div>
             </div>
-            <NewCommentSM id={comment?._id} className={show?"":`hidden`}/>
+            <NewCommentSM
+                id={comment?._id}
+                className={showReplyInput ? "" : `hidden`}
+            />
+            <button
+                type="button"
+                onClick={HandleShowReplies}
+                className="ml-20 flex pb-2 gap-1 justify-center items-center rounded-full text-black font-medium dark:text-blue-500 border-gray-200 dark:hover:text-blue-400"
+            >
+                {replies.length
+                    ? `${replies.length} ${
+                          replies.length > 1 ? "Replies" : "Reply"
+                      }`
+                    : ""}
+            </button>
+            <div
+                className={`${showReplies ? "" : "hidden"} flex flex-col gap-2`}
+            >
+                {replies.map((comment) => (
+                    <Comment
+                        key={comment._id}
+                        hasParent={comment.parentComment}
+                        comment={comment}
+                    />
+                ))}
+            </div>
         </div>
     );
 };
