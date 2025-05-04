@@ -2,6 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentVideo } from "../features/videos/videoSlice";
+import { timeAgo } from "../utils/timeAgo";
+
 const VideoPost = ({ video }) => {
 
     return (
@@ -13,6 +15,7 @@ const VideoPost = ({ video }) => {
                     src={video.thumbnail}
                     alt="Video thumbnail"
                 />
+                <span className="relative top-0">{video?.views}</span>
             </div>
 
             <div className="flex flex-col justify-between mt-2 pr-2 h-20 text-sm">
@@ -29,7 +32,7 @@ const VideoPost = ({ video }) => {
                     />
                     <div className="flex flex-col gap-0">
                         <p className="text-sm">{video.ownerName}</p>
-                        <p className="text-sm -mt-1">{video.createdAt}</p>
+                        <p className="text-sm -mt-1">{timeAgo(video.createdAt)}</p>
                     </div>
                 </div>
             </div>
