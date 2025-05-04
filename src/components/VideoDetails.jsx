@@ -6,6 +6,7 @@ import VideoButtons from "./VideoButtons";
 import VideoDescription from "./VideoDescription";
 import SeparaterHr from "./SeparaterHr";
 import { useDispatch, useSelector } from "react-redux";
+import { timeAgo } from "../utils/timeAgo";
 
 const VideoDetails = () => {
     const video = useSelector((store) => store.video.currentVideo);
@@ -24,7 +25,7 @@ const VideoDetails = () => {
                         <div className="flex items-end gap-4 text-gray-300 text-sm">
                             <span className="flex gap-1 items-center">
                                 <IoCalendarOutline className="text-lg" />{" "}
-                                {video?.createdAt}
+                                {timeAgo(video?.createdAt)}
                             </span>
                             <span className="flex gap-1 items-center">
                                 <IoEyeOutline className="text-lg" />

@@ -57,6 +57,7 @@ const Comment = ({ comment, hasParent }) => {
                       )
                     : [...commentsList, newObj];
             dispatch(setCurrentVideoComments(updatedComments));
+            setShowReplyInput(false)
         } catch (error) {
             console.error("Failed to toggle like:", error);
         }
