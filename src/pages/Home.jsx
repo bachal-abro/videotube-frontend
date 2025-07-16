@@ -57,7 +57,7 @@ const Home = () => {
             </div>
         );
     } else if (isError) {
-        return <p>{JSON.stringify(error)}</p>;
+        return <p>There is are no videos to show</p>;
     }
 };
 

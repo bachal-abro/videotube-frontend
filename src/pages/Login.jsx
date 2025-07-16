@@ -27,6 +27,7 @@ const Login = () => {
         e.preventDefault();
         try {
             const userData = await login({ username, password }).unwrap();
+            console.log(userData);
             // Assuming response shape: { data: { accessToken, user } }
             dispatch(
                 setCredentials({

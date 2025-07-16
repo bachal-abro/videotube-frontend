@@ -12,40 +12,33 @@ const usePersistLogin = () => {
     const [persistLoaded, setPersistLoaded] = useState(false);
     const [refreshAccessToken] = useRefreshAccessTokenMutation();
     const [getUser] = useGetUserMutation();
-
     useEffect(() => {
-        // If no access token is found in Redux state, attempt to refresh it.
-        if (!token) {
-            refreshAccessToken()
-                .unwrap()
-                .then((data) => {
-                    // Store the token using the key "token"
-                    dispatch(setCredentials({ token: data.data.accessToken }));
-                    getUser()
-                        .unwrap()
-                        .then((userData) => {
-                            dispatch(
-                                setCredentials({
-                                    token: data.data.accessToken,
-                                    user: userData.data,
-                                })
-                            );
-                            setPersistLoaded(true);
-                        })
-                        .catch((error) => {
-                            console.error("Failed to fetch user info:", error);
-                            dispatch(logOut());
-                            setPersistLoaded(true);
-                        });
-                })
-                .catch((err) => {
-                    console.error("Token refresh failed:", err);
-                    dispatch(logOut());
-                    setPersistLoaded(true);
-                });
+        const verifyRefreshToken = async () => {
+            try {
+                const data = await refreshAccessToken();
+                dispatch(setCredentials({ token: data.data.accessToken }));
+                const userData = await getUser().unwrap();
+                dispatch(
+                    setCredentials({
+                        token: data.data.accessToken,
+                        user: userData.data,
+                    })
+                );
+                setPersistLoaded(true);
+            } catch (err) {
+                dispatch(logOut());
+                setPersistLoaded(true);
+            } finally {
+                setPersistLoaded(true);
+            }
+        };
+        if (token == null) {
+            verifyRefreshToken();
+        } else {
+            setPersistLoaded(true);
+            console.log("token");
         }
     }, [token, dispatch, refreshAccessToken, getUser]);
-
     return persistLoaded;
 };
 

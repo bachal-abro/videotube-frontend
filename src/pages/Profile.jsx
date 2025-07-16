@@ -5,10 +5,11 @@ import CategoryNavigation from "../components/CategoryNavigation";
 import { useSelector } from "react-redux";
 const Profile = () => {
   const { user, token } = useSelector((store) => store.auth);
+  console.log(user);
   const categoryItems = [
     {
       name: "Home",
-      url: "/@username",
+      url: `/@${user?.username}`,
       active: true,
     },
     {
