@@ -16,6 +16,7 @@ import RequireAuth from "./features/auth/RequireAuth";
 import ProfileHome from "./components/ProfileHome";
 import usePersistLogin from "./hooks/usePersistLogin";
 import LogoutButton from "./components/ui/LogoutButton";
+import VideoDetailPage from "./pages/VideoDetailPage";
 
 function App() {
     const persistLoaded = usePersistLogin();
@@ -40,7 +41,7 @@ function App() {
                     <Route path="logout" element={<LogoutButton />} />
 
                     {/* Videos */}
-                    <Route path="videos/:videoId" element={<VideoView/>} />
+                    <Route path="videos/:videoId" element={<VideoDetailPage/>} />
                 </Route>
             </Route>
         </Routes>

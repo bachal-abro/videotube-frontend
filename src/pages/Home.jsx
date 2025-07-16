@@ -1,35 +1,14 @@
 import React, { useEffect } from "react";
 import HomeFeed from "../components/HomeFeed";
 import { useDispatch, useSelector } from "react-redux";
-import CategoryNavigation from "../components/CategoryNavigation";
+import { VideoCard } from "../components/video-card";
 import { setVideoFeed } from "../features/videos/videoSlice";
 import { useGetAllVideosQuery } from "../features/videos/videosApiSlice";
+import { videosData } from "../data/videos";
+import { categories } from "../data/categories"; // Import categories
+import { Button } from "../components/ui/button"; // Import Button
 
 const Home = () => {
-    // const fetchStatus = useSelector((store) => store.fetchStatus);
-    const categoryItems = [
-        {
-            name: "All",
-            url: "/",
-            active: true,
-        },
-        {
-            name: "Tech",
-            url: "/category/:tech",
-            active: true,
-        },
-        {
-            name: "Movies",
-            url: "/category/:movies",
-            active: true,
-        },
-        {
-            name: "Music",
-            url: "/category/:music",
-            active: true,
-        },
-    ];
-
     const { videoFeed } = useSelector((store) => store.video);
     const dispatch = useDispatch();
 
@@ -41,24 +20,45 @@ const Home = () => {
         }
     }, [isSuccess, data, dispatch]);
 
-    let content;
     if (isLoading) {
-        content = <p>"Loading..."</p>;
+        return <p>"Loading..."</p>;
     } else if (isSuccess) {
-        content = (
-            <div className="flex flex-col w-full sm:w-auto px-1 ml-1">
-                <div className="h-12"></div>
-                <CategoryNavigation>{categoryItems}</CategoryNavigation>
-                {/* <Fetching/> */}
-                <HomeFeed />
-                {/* {fetchStatus.currentlyFetching ? <Spinner/>: <HomeFeed />} */}
+        return (
+            <div className="container mx-auto py-10 px-4 lg:px-6">
+                <div className="mb-8 flex overflow-x-auto pb-4 scrollbar-hide max">
+                    <div className="flex gap-3 whitespace-nowrap w-0">
+                        {categories.map((category) => (
+                            <Button
+                                key={category}
+                                variant="secondary"
+                                className="rounded-full px-4 py-2 text-sm flex-shrink-0"
+                            >
+                                {category}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {videosData.map((video) => (
+                        <VideoCard
+                            key={video.id}
+                            id={video.id}
+                            thumbnail={video.thumbnail}
+                            title={video.title}
+                            channelName={video.channelName}
+                            channelAvatar={video.channelAvatar}
+                            views={video.views}
+                            timestamp={video.timestamp}
+                            duration={video.duration}
+                            videoPreview={video.videoPreview}
+                        />
+                    ))}
+                </div>
             </div>
         );
     } else if (isError) {
-        content = <p>{JSON.stringify(error)}</p>;
+        return <p>{JSON.stringify(error)}</p>;
     }
-
-    return content;
 };
 
 export default Home;
