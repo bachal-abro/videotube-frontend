@@ -10,102 +10,267 @@ import {
     Bell,
     Send,
     Plus,
-} from "lucide-react"; // Added Plus icon
+    Flag,
+    FileText,
+    Check,
+} from "lucide-react";
+
 import { cn } from "../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Button } from "../components/ui/button";
 import { Textarea } from "../components/ui/textarea";
 import { VideoCard } from "../components/video-card";
-import { videosData } from "../data/videos";
 import { AddToPlaylistDialog } from "../components/AddToPlaylistDialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu";
+import { useToast } from "../hooks/use-toast"; // Import useToast
+import { videosData } from "../data/videos";
+import { useDispatch, useSelector } from "react-redux";
+import { setCurrentVideo } from "../features/videos/videoSlice";
+import { useGetVideoByIdQuery } from "../features/videos/videosApiSlice";
+import { timeAgo } from "../utils/timeAgo";
 
 export default function VideoDetailPage() {
+    const { toast } = useToast();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const { videoId } = useParams();
-    const [video, setVideo] = useState(null);
     const [relatedVideos, setRelatedVideos] = useState([]);
     const [isSavedToWatchLater, setIsSavedToWatchLater] = useState(false);
-    const [isLiked, setIsLiked] = useState(false); // New state for liked status
-    const [likeCount, setLikeCount] = useState(0); // State for like count
+    const [isLiked, setIsLiked] = useState(false);
+    const [isDisliked, setIsDisliked] = useState(false); // New state for disliked status
+    const [likeCount, setLikeCount] = useState(0);
+    const [dislikeCount, setDislikeCount] = useState(0); // New state for dislike count
     const [isAddToPlaylistDialogOpen, setIsAddToPlaylistDialogOpen] =
-        useState(false); // New state for playlist dialog
+        useState(false);
+    const [showFullDescription, setShowFullDescription] = useState(false); // State for description expansion
+    const [commentText, setCommentText] = useState(""); // State for comment input
+    const [isSubscribed, setIsSubscribed] = useState(false); // State for subscribe button
+
+    const { data, isLoading, isSuccess, isError, error } =
+        useGetVideoByIdQuery(videoId);
+    const video = useSelector((store) => store.video.currentVideo);
 
     useEffect(() => {
-        // Find the video with the matching videoId
-        const foundVideo = videosData.find((v) => v.id === videoId);
-
-        if (foundVideo) {
-            setVideo(foundVideo);
-            // Get related videos (excluding current video)
+        if (data && isSuccess) {
+            dispatch(setCurrentVideo(data?.data));
             setRelatedVideos(
                 videosData.filter((v) => v.id !== videoId).slice(0, 5)
             );
 
-            // Initialize like count from video data (or a more dynamic source)
-            // For demonstration, we'll parse the views as a base for likes
-            const baseLikes =
-                (Number.parseInt(foundVideo.views.replace(/[KM]/g, "")) *
-                    (foundVideo.views.includes("M") ? 1000000 : 1000)) /
-                10; // Example: 10% of views
-            setLikeCount(baseLikes);
-
+            // Check if video is already in watch later
             const storedWatchLaterVideos =
                 localStorage.getItem("watchLaterVideos");
             if (storedWatchLaterVideos) {
                 const videoIds = JSON.parse(storedWatchLaterVideos);
-                setIsSavedToWatchLater(videoIds.includes(foundVideo.id));
+                setIsSavedToWatchLater(videoIds.includes(video._id));
             }
 
             // Check if video is already liked
             const storedLikedVideos = localStorage.getItem("likedVideos");
             if (storedLikedVideos) {
                 const likedVideoIds = JSON.parse(storedLikedVideos);
-                setIsLiked(likedVideoIds.includes(foundVideo.id));
+                setIsLiked(likedVideoIds.includes(video._id));
             }
+
+            // Check if video is already disliked (for persistent state)
+            const storedDislikedVideos = localStorage.getItem("dislikedVideos");
+            if (storedDislikedVideos) {
+                const dislikedVideoIds = JSON.parse(storedDislikedVideos);
+                setIsDisliked(dislikedVideoIds.includes(video._id));
+            }
+
+            // Simulate subscription status
+            const storedSubscription = localStorage.getItem(
+                `subscribed-${video?.owner?.username}`
+            );
+            setIsSubscribed(storedSubscription === "true");
         }
-    }, [videoId]);
+    }, [videoId, isSuccess, isLoading]);
 
     const handleToggleWatchLater = () => {
         const storedVideos = localStorage.getItem("watchLaterVideos");
         let videoIds = storedVideos ? JSON.parse(storedVideos) : [];
 
         if (isSavedToWatchLater) {
-            // Remove from watch later
             videoIds = videoIds.filter((videoId) => videoId !== video.id);
+            toast({
+                title: "Removed from Watch Later",
+                description: video.title,
+            });
         } else {
-            // Add to watch later
             if (!videoIds.includes(video.id)) {
                 videoIds.push(video.id);
             }
+            toast({
+                title: "Added to Watch Later",
+                description: video.title,
+            });
         }
         localStorage.setItem("watchLaterVideos", JSON.stringify(videoIds));
         setIsSavedToWatchLater(!isSavedToWatchLater);
     };
 
     const handleToggleLike = () => {
-        const storedVideos = localStorage.getItem("likedVideos");
-        let videoIds = storedVideos ? JSON.parse(storedVideos) : [];
+        const storedLikedVideos = localStorage.getItem("likedVideos");
+        let likedVideoIds = storedLikedVideos
+            ? JSON.parse(storedLikedVideos)
+            : [];
+
+        const storedDislikedVideos = localStorage.getItem("dislikedVideos");
+        let dislikedVideoIds = storedDislikedVideos
+            ? JSON.parse(storedDislikedVideos)
+            : [];
 
         if (isLiked) {
             // Unlike video
-            videoIds = videoIds.filter((videoId) => videoId !== video.id);
+            likedVideoIds = likedVideoIds.filter(
+                (videoId) => videoId !== video.id
+            );
             setLikeCount((prev) => prev - 1);
+            toast({
+                title: "Unliked video",
+                description: video.title,
+            });
         } else {
             // Like video
-            if (!videoIds.includes(video.id)) {
-                videoIds.push(video.id);
+            if (!likedVideoIds.includes(video.id)) {
+                likedVideoIds.push(video.id);
             }
             setLikeCount((prev) => prev + 1);
+            toast({
+                title: "Liked video",
+                description: video.title,
+            });
+
+            // If currently disliked, remove dislike
+            if (isDisliked) {
+                dislikedVideoIds = dislikedVideoIds.filter(
+                    (videoId) => videoId !== video.id
+                );
+                setDislikeCount((prev) => prev - 1);
+                setIsDisliked(false);
+                localStorage.setItem(
+                    "dislikedVideos",
+                    JSON.stringify(dislikedVideoIds)
+                );
+            }
         }
-        localStorage.setItem("likedVideos", JSON.stringify(videoIds));
+        localStorage.setItem("likedVideos", JSON.stringify(likedVideoIds));
         setIsLiked(!isLiked);
+    };
+
+    const handleToggleDislike = () => {
+        const storedDislikedVideos = localStorage.getItem("dislikedVideos");
+        let dislikedVideoIds = storedDislikedVideos
+            ? JSON.parse(storedDislikedVideos)
+            : [];
+
+        const storedLikedVideos = localStorage.getItem("likedVideos");
+        let likedVideoIds = storedLikedVideos
+            ? JSON.parse(storedLikedVideos)
+            : [];
+
+        if (isDisliked) {
+            // Undislike video
+            dislikedVideoIds = dislikedVideoIds.filter(
+                (videoId) => videoId !== video.id
+            );
+            setDislikeCount((prev) => prev - 1);
+            toast({
+                title: "Removed dislike",
+                description: video.title,
+            });
+        } else {
+            // Dislike video
+            if (!dislikedVideoIds.includes(video.id)) {
+                dislikedVideoIds.push(video.id);
+            }
+            setDislikeCount((prev) => prev + 1);
+            toast({
+                title: "Disliked video",
+                description: video.title,
+            });
+
+            // If currently liked, remove like
+            if (isLiked) {
+                likedVideoIds = likedVideoIds.filter(
+                    (videoId) => videoId !== video.id
+                );
+                setLikeCount((prev) => prev - 1);
+                setIsLiked(false);
+                localStorage.setItem(
+                    "likedVideos",
+                    JSON.stringify(likedVideoIds)
+                );
+            }
+        }
+        localStorage.setItem(
+            "dislikedVideos",
+            JSON.stringify(dislikedVideoIds)
+        );
+        setIsDisliked(!isDisliked);
+    };
+
+    const handleShare = () => {
+        if (navigator.clipboard && video) {
+            const videoUrl = `${window.location.origin}/video/${video.id}`;
+            navigator.clipboard.writeText(videoUrl).then(() => {
+                toast({
+                    title: "Link copied!",
+                    description: "Video URL copied to clipboard.",
+                    icon: <Check className="h-4 w-4" />,
+                });
+            });
+        }
+    };
+
+    const handleDownload = () => {
+        if (video && video.videoPreview) {
+            // In a real app, this would trigger a server-side download or a direct file download.
+            // For simulation, we'll just open the video URL in a new tab.
+            window.open(video.videoPreview, "_blank");
+            toast({
+                title: "Download initiated",
+                description: "Video download should start shortly.",
+            });
+        }
+    };
+
+    const handlePostComment = () => {
+        if (commentText.trim()) {
+            console.log("Posting comment:", commentText);
+            toast({
+                title: "Comment posted!",
+                description: "Your comment has been added.",
+            });
+            setCommentText(""); // Clear input after posting
+        }
+    };
+
+    const handleToggleSubscribe = () => {
+        setIsSubscribed(!isSubscribed);
+        localStorage.setItem(`subscribed-${video.channelName}`, !isSubscribed);
+        toast({
+            title: isSubscribed
+                ? `Unsubscribed from ${video.channelName}`
+                : `Subscribed to ${video.channelName}`,
+            description: isSubscribed
+                ? "You will no longer receive notifications."
+                : "You will now receive notifications.",
+        });
     };
 
     // Callback for when video is saved/removed from playlists
     const handlePlaylistSave = () => {
-        // You might want to re-check playlist status here if needed,
-        // but for now, the dialog handles its own state and localStorage updates.
-        console.log("Video playlist status updated.");
+        toast({
+            title: "Playlist updated",
+            description: "Video added/removed from selected playlists.",
+        });
     };
 
     if (!video) {
@@ -116,6 +281,20 @@ export default function VideoDetailPage() {
         );
     }
 
+    const descriptionLines = video.description
+        ? video.description.split("\n")
+        : [];
+    const displayDescription = showFullDescription
+        ? descriptionLines.join("\n")
+        : descriptionLines.slice(0, 3).join("\n");
+    const needsTruncation =
+        descriptionLines.length > 3 ||
+        (video.description && video.description.length > 200); // Arbitrary length for truncation
+
+    if (isLoading || !isSuccess || !video.title) {
+        return <p>Video is loading</p>
+    }
+    
     return (
         <div className="container mx-auto py-6 px-4 lg:px-6">
             <Button
@@ -133,10 +312,7 @@ export default function VideoDetailPage() {
                     {/* Video player */}
                     <div className="relative rounded-xl overflow-hidden aspect-video bg-black shadow-lg">
                         <video
-                            src={
-                                video.videoPreview ||
-                                "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-                            }
+                            src={video.videoFile}
                             className="w-full h-full"
                             controls
                             autoPlay
@@ -155,29 +331,37 @@ export default function VideoDetailPage() {
                                 <Avatar className="h-10 w-10 ring-2 ring-primary/20">
                                     <AvatarImage
                                         src={
-                                            video.channelAvatar ||
+                                            video.owner.avatar ||
                                             "https://placehold.co/40x40"
                                         }
-                                        alt={video.channelName}
+                                        alt={video.owner.fullName}
                                     />
                                     <AvatarFallback>
-                                        {video.channelName.charAt(0)}
+                                        {video.owner.fullName.charAt(0)}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div>
                                     <p className="font-medium">
-                                        {video.channelName}
+                                        {video.owner.fullName}
                                     </p>
                                     <p className="text-sm text-muted-foreground">
-                                        1.2M subscribers
+                                        {video.owner.subscribers} subscribers
                                     </p>
                                 </div>
                                 <Button
-                                    variant="outline"
+                                    variant={
+                                        video.owner.isSubscribed ? "secondary" : "outline"
+                                    }
                                     size="sm"
                                     className="ml-2 bg-transparent"
+                                    onClick={handleToggleSubscribe}
                                 >
-                                    <Bell className="mr-2 h-4 w-4" /> Subscribe
+                                    {video.owner.isSubscribed ? (
+                                        <Check className="mr-2 h-4 w-4" />
+                                    ) : (
+                                        <Bell className="mr-2 h-4 w-4" />
+                                    )}{" "}
+                                    {video.owner.isSubscribed ? "Subscribed" : "Subscribe"}
                                 </Button>
                             </div>
 
@@ -187,26 +371,32 @@ export default function VideoDetailPage() {
                                     size="sm"
                                     className={cn(
                                         "bg-secondary/80 hover:bg-secondary",
-                                        isLiked &&
+                                        video.isLiked &&
                                             "bg-primary text-primary-foreground hover:bg-primary/90"
                                     )}
                                     onClick={handleToggleLike}
                                 >
                                     <ThumbsUp className="mr-2 h-4 w-4" />{" "}
-                                    {likeCount.toLocaleString()}
+                                    {video?.likeCount?.toLocaleString()}
                                 </Button>
-
                                 <Button
                                     variant="secondary"
                                     size="sm"
-                                    className="bg-secondary/80 hover:bg-secondary"
+                                    className={cn(
+                                        "bg-secondary/80 hover:bg-secondary",
+                                        video.isDisliked &&
+                                            "bg-primary text-primary-foreground hover:bg-primary/90"
+                                    )}
+                                    onClick={handleToggleDislike}
                                 >
-                                    <ThumbsDown className="mr-2 h-4 w-4" /> 2.5K
+                                    <ThumbsDown className="mr-2 h-4 w-4" />{" "}
+                                    {dislikeCount?.toLocaleString()}
                                 </Button>
                                 <Button
                                     variant="secondary"
                                     size="sm"
                                     className="bg-secondary/80 hover:bg-secondary"
+                                    onClick={handleShare}
                                 >
                                     <Share2 className="mr-2 h-4 w-4" /> Share
                                 </Button>
@@ -214,6 +404,7 @@ export default function VideoDetailPage() {
                                     variant="secondary"
                                     size="sm"
                                     className="bg-secondary/80 hover:bg-secondary"
+                                    onClick={handleDownload}
                                 >
                                     <Download className="mr-2 h-4 w-4" />{" "}
                                     Download
@@ -224,17 +415,31 @@ export default function VideoDetailPage() {
                                     className="bg-secondary/80 hover:bg-secondary"
                                     onClick={() =>
                                         setIsAddToPlaylistDialogOpen(true)
-                                    } // Open playlist dialog
+                                    }
                                 >
                                     <Plus className="mr-2 h-4 w-4" /> Save
                                 </Button>
-                                <Button
-                                    variant="secondary"
-                                    size="sm"
-                                    className="bg-secondary/80 hover:bg-secondary"
-                                >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                </Button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            className="bg-secondary/80 hover:bg-secondary"
+                                        >
+                                            <MoreHorizontal className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem>
+                                            <Flag className="mr-2 h-4 w-4" />{" "}
+                                            Report
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem>
+                                            <FileText className="mr-2 h-4 w-4" />{" "}
+                                            Show Transcript
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         </div>
 
@@ -245,19 +450,27 @@ export default function VideoDetailPage() {
                                     {video.views} views
                                 </span>
                                 <span>•</span>
-                                <span>{video.timestamp}</span>
+                                <span>{timeAgo(video.createdAt)}</span>
                             </div>
-                            <p className="text-sm">
-                                {video.description ||
-                                    `This is a detailed description of "${video.title}". The video covers various aspects of the topic and provides valuable insights. Watch the full video to learn more about this interesting subject.`}
+                            <p className="text-sm whitespace-pre-wrap">
+                                {displayDescription}
                             </p>
-                            <Button
-                                variant="link"
-                                size="sm"
-                                className="px-0 text-xs"
-                            >
-                                Show more
-                            </Button>
+                            {needsTruncation && (
+                                <Button
+                                    variant="link"
+                                    size="sm"
+                                    className="px-0 text-xs"
+                                    onClick={() =>
+                                        setShowFullDescription(
+                                            !showFullDescription
+                                        )
+                                    }
+                                >
+                                    {showFullDescription
+                                        ? "Show less"
+                                        : "Show more"}
+                                </Button>
+                            )}
                         </div>
 
                         {/* Comments section */}
@@ -282,12 +495,24 @@ export default function VideoDetailPage() {
                                     <Textarea
                                         placeholder="Add a comment..."
                                         className="resize-none"
+                                        value={commentText}
+                                        onChange={(e) =>
+                                            setCommentText(e.target.value)
+                                        }
                                     />
                                     <div className="flex justify-end gap-2">
-                                        <Button variant="ghost" size="sm">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setCommentText("")}
+                                        >
                                             Cancel
                                         </Button>
-                                        <Button size="sm">
+                                        <Button
+                                            size="sm"
+                                            onClick={handlePostComment}
+                                            disabled={!commentText.trim()}
+                                        >
                                             <Send className="mr-2 h-4 w-4" />{" "}
                                             Comment
                                         </Button>
@@ -361,8 +586,8 @@ export default function VideoDetailPage() {
                     <div className="space-y-4">
                         {relatedVideos.map((relatedVideo) => (
                             <VideoCard
-                                key={relatedVideo.videoId}
-                                videoId={relatedVideo.videoId}
+                                key={relatedVideo.id}
+                                id={relatedVideo.id}
                                 thumbnail={relatedVideo.thumbnail}
                                 title={relatedVideo.title}
                                 channelName={relatedVideo.channelName}
@@ -376,6 +601,7 @@ export default function VideoDetailPage() {
                     </div>
                 </div>
             </div>
+
             {video && (
                 <AddToPlaylistDialog
                     isOpen={isAddToPlaylistDialogOpen}

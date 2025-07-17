@@ -7,11 +7,11 @@ import { useGetAllVideosQuery } from "../features/videos/videosApiSlice";
 import { videosData } from "../data/videos";
 import { categories } from "../data/categories"; // Import categories
 import { Button } from "../components/ui/button"; // Import Button
+import { timeAgo } from "../utils/timeAgo";
 
 const Home = () => {
     const { videoFeed } = useSelector((store) => store.video);
     const dispatch = useDispatch();
-
     const { data, isLoading, isSuccess, isError, error } =
         useGetAllVideosQuery();
     useEffect(() => {
@@ -23,6 +23,7 @@ const Home = () => {
     if (isLoading) {
         return <p>"Loading..."</p>;
     } else if (isSuccess) {
+        console.log(videoFeed);
         return (
             <div className="container mx-auto py-10 px-4 lg:px-6">
                 <div className="mb-8 flex overflow-x-auto pb-4 scrollbar-hide max">
@@ -39,18 +40,18 @@ const Home = () => {
                     </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {videosData.map((video) => (
+                    {videoFeed.map((video) => (
                         <VideoCard
-                            key={video.id}
-                            id={video.id}
+                            key={video._id}
+                            id={video._id}
                             thumbnail={video.thumbnail}
                             title={video.title}
-                            channelName={video.channelName}
-                            channelAvatar={video.channelAvatar}
+                            channelName={video.ownerName}
+                            channelAvatar={video.ownerAvatar}
                             views={video.views}
-                            timestamp={video.timestamp}
+                            timestamp={timeAgo(video.createdAt)}
                             duration={video.duration}
-                            videoPreview={video.videoPreview}
+                            videoPreview={video.videoFile}
                         />
                     ))}
                 </div>

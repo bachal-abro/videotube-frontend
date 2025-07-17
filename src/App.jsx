@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import {
     Home,
     VideoView,
@@ -20,38 +19,49 @@ import usePersistLogin from "./hooks/usePersistLogin";
 import LogoutButton from "./components/ui/LogoutButton";
 import VideoDetailPage from "./pages/VideoDetailPage";
 import { useState } from "react";
-
+import { Toaster } from "./components/ui/toast"; // Import Toaster
 function App() {
     const persistLoaded = usePersistLogin();
     if (!persistLoaded) return <p>Loading...</p>; // or a spinner
 
     return (
-        <Routes>
-            <Route path="/" element={<Layout />}>
-                {/* public routes */}
-                <Route path="login" element={<Login />} />
-                {/* protected routes */}
-                <Route element={<RequireAuth />}>
-                    <Route index element={<Home />} />
-                    <Route path=":username" element={<Profile />}>
-                        <Route element={<ProfileHome />} />
-                    </Route>
-                    <Route path="subscriptions" element={<Subscriptions />} />
-                    <Route path="history" element={<History />} />
-                    <Route path="watch-later" element={<WatchLaterPage />} /> 
-                    <Route path="liked" element={<LikedVideos />} />
-                    <Route path="playlists" element={<PlaylistsPage />} /> 
-                    <Route path="settings" element={<Settings />} />
-                    <Route path="logout" element={<Login />} />
+        <>
+            {" "}
+            {/* Use a fragment to wrap Routes and Toaster */}
+            <Routes>
+                <Route path="/" element={<Layout />}>
+                    {/* public routes */}
+                    <Route path="login" element={<Login />} />
+                    {/* protected routes */}
+                    <Route element={<RequireAuth />}>
+                        <Route index element={<Home />} />
+                        <Route path=":username" element={<Profile />}>
+                            <Route element={<ProfileHome />} />
+                        </Route>
+                        <Route
+                            path="subscriptions"
+                            element={<Subscriptions />}
+                        />
+                        <Route path="history" element={<History />} />
+                        <Route
+                            path="watch-later"
+                            element={<WatchLaterPage />}
+                        />
+                        <Route path="liked" element={<LikedVideos />} />
+                        <Route path="playlists" element={<PlaylistsPage />} />
+                        <Route path="settings" element={<Settings />} />
+                        <Route path="logout" element={<Login />} />
 
-                    {/* Videos */}
-                    <Route
-                        path="videos/:videoId"
-                        element={<VideoDetailPage />}
-                    />
+                        {/* Videos */}
+                        <Route
+                            path="videos/:videoId"
+                            element={<VideoDetailPage />}
+                        />
+                    </Route>
                 </Route>
-            </Route>
-        </Routes>
+            </Routes>
+            <Toaster /> {/* Add Toaster component here */}
+        </>
     );
 }
 
