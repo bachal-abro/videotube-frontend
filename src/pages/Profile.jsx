@@ -4,8 +4,7 @@ import SeparaterHr from "../components/SeparaterHr";
 import CategoryNavigation from "../components/CategoryNavigation";
 import { useSelector } from "react-redux";
 const Profile = () => {
-  const { user, token } = useSelector((store) => store.auth);
-  console.log(user);
+  const { user } = useSelector((store) => store.auth);
   const categoryItems = [
     {
       name: "Home",

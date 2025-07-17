@@ -9,19 +9,26 @@ import {
     MoreHorizontal,
     Bell,
     Send,
-} from "lucide-react";
-
+    Plus,
+} from "lucide-react"; // Added Plus icon
+import { cn } from "../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Button } from "../components/ui/button";
 import { Textarea } from "../components/ui/textarea";
 import { VideoCard } from "../components/video-card";
 import { videosData } from "../data/videos";
+import { AddToPlaylistDialog } from "../components/AddToPlaylistDialog";
 
 export default function VideoDetailPage() {
     const navigate = useNavigate();
     const { videoId } = useParams();
     const [video, setVideo] = useState(null);
     const [relatedVideos, setRelatedVideos] = useState([]);
+    const [isSavedToWatchLater, setIsSavedToWatchLater] = useState(false);
+    const [isLiked, setIsLiked] = useState(false); // New state for liked status
+    const [likeCount, setLikeCount] = useState(0); // State for like count
+    const [isAddToPlaylistDialogOpen, setIsAddToPlaylistDialogOpen] =
+        useState(false); // New state for playlist dialog
 
     useEffect(() => {
         // Find the video with the matching videoId
@@ -30,9 +37,76 @@ export default function VideoDetailPage() {
         if (foundVideo) {
             setVideo(foundVideo);
             // Get related videos (excluding current video)
-            setRelatedVideos(videosData.filter((v) => v.id !== videoId).slice(0, 5));
+            setRelatedVideos(
+                videosData.filter((v) => v.id !== videoId).slice(0, 5)
+            );
+
+            // Initialize like count from video data (or a more dynamic source)
+            // For demonstration, we'll parse the views as a base for likes
+            const baseLikes =
+                (Number.parseInt(foundVideo.views.replace(/[KM]/g, "")) *
+                    (foundVideo.views.includes("M") ? 1000000 : 1000)) /
+                10; // Example: 10% of views
+            setLikeCount(baseLikes);
+
+            const storedWatchLaterVideos =
+                localStorage.getItem("watchLaterVideos");
+            if (storedWatchLaterVideos) {
+                const videoIds = JSON.parse(storedWatchLaterVideos);
+                setIsSavedToWatchLater(videoIds.includes(foundVideo.id));
+            }
+
+            // Check if video is already liked
+            const storedLikedVideos = localStorage.getItem("likedVideos");
+            if (storedLikedVideos) {
+                const likedVideoIds = JSON.parse(storedLikedVideos);
+                setIsLiked(likedVideoIds.includes(foundVideo.id));
+            }
         }
     }, [videoId]);
+
+    const handleToggleWatchLater = () => {
+        const storedVideos = localStorage.getItem("watchLaterVideos");
+        let videoIds = storedVideos ? JSON.parse(storedVideos) : [];
+
+        if (isSavedToWatchLater) {
+            // Remove from watch later
+            videoIds = videoIds.filter((videoId) => videoId !== video.id);
+        } else {
+            // Add to watch later
+            if (!videoIds.includes(video.id)) {
+                videoIds.push(video.id);
+            }
+        }
+        localStorage.setItem("watchLaterVideos", JSON.stringify(videoIds));
+        setIsSavedToWatchLater(!isSavedToWatchLater);
+    };
+
+    const handleToggleLike = () => {
+        const storedVideos = localStorage.getItem("likedVideos");
+        let videoIds = storedVideos ? JSON.parse(storedVideos) : [];
+
+        if (isLiked) {
+            // Unlike video
+            videoIds = videoIds.filter((videoId) => videoId !== video.id);
+            setLikeCount((prev) => prev - 1);
+        } else {
+            // Like video
+            if (!videoIds.includes(video.id)) {
+                videoIds.push(video.id);
+            }
+            setLikeCount((prev) => prev + 1);
+        }
+        localStorage.setItem("likedVideos", JSON.stringify(videoIds));
+        setIsLiked(!isLiked);
+    };
+
+    // Callback for when video is saved/removed from playlists
+    const handlePlaylistSave = () => {
+        // You might want to re-check playlist status here if needed,
+        // but for now, the dialog handles its own state and localStorage updates.
+        console.log("Video playlist status updated.");
+    };
 
     if (!video) {
         return (
@@ -111,10 +185,17 @@ export default function VideoDetailPage() {
                                 <Button
                                     variant="secondary"
                                     size="sm"
-                                    className="bg-secondary/80 hover:bg-secondary"
+                                    className={cn(
+                                        "bg-secondary/80 hover:bg-secondary",
+                                        isLiked &&
+                                            "bg-primary text-primary-foreground hover:bg-primary/90"
+                                    )}
+                                    onClick={handleToggleLike}
                                 >
-                                    <ThumbsUp className="mr-2 h-4 w-4" /> 125K
+                                    <ThumbsUp className="mr-2 h-4 w-4" />{" "}
+                                    {likeCount.toLocaleString()}
                                 </Button>
+
                                 <Button
                                     variant="secondary"
                                     size="sm"
@@ -136,6 +217,16 @@ export default function VideoDetailPage() {
                                 >
                                     <Download className="mr-2 h-4 w-4" />{" "}
                                     Download
+                                </Button>
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    className="bg-secondary/80 hover:bg-secondary"
+                                    onClick={() =>
+                                        setIsAddToPlaylistDialogOpen(true)
+                                    } // Open playlist dialog
+                                >
+                                    <Plus className="mr-2 h-4 w-4" /> Save
                                 </Button>
                                 <Button
                                     variant="secondary"
@@ -285,6 +376,14 @@ export default function VideoDetailPage() {
                     </div>
                 </div>
             </div>
+            {video && (
+                <AddToPlaylistDialog
+                    isOpen={isAddToPlaylistDialogOpen}
+                    onOpenChange={setIsAddToPlaylistDialogOpen}
+                    video={video}
+                    onSave={handlePlaylistSave}
+                />
+            )}
         </div>
     );
 }

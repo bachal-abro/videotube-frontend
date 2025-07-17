@@ -12,26 +12,23 @@ import {
 } from "../components/ui/popover";
 import { Menu, Search, X, Bell, User, Settings, LogOut } from "lucide-react";
 import Header from "./Header";
+import { useSelector } from "react-redux";
 
 export default function Layout() {
-    const [sidebarOpen, setSidebarOpen] = useState(true); // Default open on desktop
+    const { sidebarOpen } = useSelector((store) => store.system);
     const [searchQuery, setSearchQuery] = useState("");
 
     const handleSearch = (e) => {
         e.preventDefault();
         console.log("Searching for:", searchQuery);
-        // In a real app, you'd navigate or filter videos here
     };
 
     return (
         <div className="min-h-screen flex flex-col">
-            <Header/>
+            <Header />
             <div className="flex flex-1">
                 {/* Sidebar */}
-                <Sidebar
-                    isOpen={sidebarOpen}
-                    onClose={() => setSidebarOpen(false)}
-                />
+                <Sidebar />
 
                 {/* Main content - automatically takes full width when sidebar is hidden */}
                 <main

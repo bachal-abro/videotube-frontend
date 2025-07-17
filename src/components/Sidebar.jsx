@@ -2,14 +2,6 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
     Home,
-    TrendingUp,
-    Music,
-    Film,
-    Gamepad2,
-    Newspaper,
-    Trophy,
-    Lightbulb,
-    Shirt,
     History,
     Clock,
     ThumbsUp,
@@ -19,28 +11,23 @@ import {
     Flag,
     ChevronDown,
     ChevronRight,
+    Tv,
+    ListVideo,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useDispatch, useSelector } from "react-redux";
+import { setSidebarOpen } from "../features/system/systemSlice";
 
 const navigationItems = [
     { icon: Home, label: "Home", path: "/" },
-    { icon: TrendingUp, label: "Trending", path: "/trending" },
-    { icon: Music, label: "Music", path: "/music" },
-    { icon: Film, label: "Movies", path: "/movies" },
-    { icon: Gamepad2, label: "Gaming", path: "/gaming" },
-    { icon: Newspaper, label: "News", path: "/news" },
-    { icon: Trophy, label: "Sports", path: "/sports" },
-    { icon: Lightbulb, label: "Learning", path: "/learning" },
-    { icon: Shirt, label: "Fashion", path: "/fashion" },
-];
-
-const libraryItems = [
+    { icon: Tv, label: "Subscriptions", path: "/subscriptions" },
     { icon: History, label: "History", path: "/history" },
     { icon: Clock, label: "Watch Later", path: "/watch-later" },
     { icon: ThumbsUp, label: "Liked Videos", path: "/liked" },
-    { icon: PlaySquare, label: "Your Videos", path: "/your-videos" },
+    { icon: ListVideo, label: "Playlists", path: "/playlists" },
 ];
+
 
 const subscriptions = [
     {
@@ -76,14 +63,21 @@ const settingsItems = [
     { icon: Flag, label: "Send Feedback", path: "/feedback" },
 ];
 
-export function Sidebar({ isOpen, onClose }) {
+export function Sidebar() {
+    const dispatch = useDispatch();
     const location = useLocation();
     const navigate = useNavigate();
     const [subscriptionsExpanded, setSubscriptionsExpanded] = useState(true);
+    const { sidebarOpen } = useSelector((store) => store.system);
+
+    const onClose = () => {
+        if (sidebarOpen) {
+            dispatch(setSidebarOpen());
+        }
+    };
 
     const handleNavigation = (path) => {
         navigate(path);
-        // Only close sidebar on mobile
         if (window.innerWidth < 1024) {
             onClose();
         }
@@ -138,7 +132,7 @@ export function Sidebar({ isOpen, onClose }) {
     );
 
     // Don't render sidebar if it's closed
-    if (!isOpen) {
+    if (!sidebarOpen) {
         return null;
     }
 
@@ -156,24 +150,6 @@ export function Sidebar({ isOpen, onClose }) {
                     {/* Main Navigation */}
                     <div className="space-y-1">
                         {navigationItems.map((item) => (
-                            <SidebarItem
-                                key={item.path}
-                                icon={item.icon}
-                                label={item.label}
-                                path={item.path}
-                                isActive={location.pathname === item.path}
-                            />
-                        ))}
-                    </div>
-
-                    <hr className="border-border" />
-
-                    {/* Library */}
-                    <div className="space-y-1">
-                        <h3 className="px-3 text-sm font-semibold text-foreground/80 mb-2">
-                            Library
-                        </h3>
-                        {libraryItems.map((item) => (
                             <SidebarItem
                                 key={item.path}
                                 icon={item.icon}

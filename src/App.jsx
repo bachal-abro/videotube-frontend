@@ -6,8 +6,10 @@ import {
     Subscriptions,
     Profile,
     History,
+    WatchLaterPage,
     LikedVideos,
     Settings,
+    PlaylistsPage,
 } from "./pages/index";
 
 import Layout from "./layout/Layout";
@@ -35,6 +37,10 @@ function App() {
                         <Route element={<ProfileHome />} />
                     </Route>
                     <Route path="subscriptions" element={<Subscriptions />} />
+                    <Route path="history" element={<History />} />
+                    <Route path="watch-later" element={<WatchLaterPage />} /> 
+                    <Route path="liked" element={<LikedVideos />} />
+                    <Route path="playlists" element={<PlaylistsPage />} /> 
                     <Route path="settings" element={<Settings />} />
                     <Route path="logout" element={<Login />} />
 

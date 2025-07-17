@@ -1,75 +1,78 @@
+"use client";
+
 import { useState, useEffect, useMemo } from "react";
-import { LikedVideoCard } from "../components/LikedVideoCard";
+import { WatchLaterVideoCard } from "../components/WatchLaterVideoCard";
 import { videosData } from "../data/videos";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Search, X, Trash2 } from "lucide-react";
 
-export default function LikedVideosPage() {
-    const [likedVideos, setLikedVideos] = useState([]);
+export default function WatchLaterPage() {
+    const [watchLaterVideos, setWatchLaterVideos] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
-        // Load liked videos from localStorage on mount
-        const storedVideos = localStorage.getItem("likedVideos");
+        // Load watch later videos from localStorage on mount
+        const storedVideos = localStorage.getItem("watchLaterVideos");
         if (storedVideos) {
             const videoIds = JSON.parse(storedVideos);
             // Filter videosData to get the actual video objects
             const videos = videosData.filter((video) =>
                 videoIds.includes(video.id)
             );
-            setLikedVideos(videos);
+            setWatchLaterVideos(videos);
         }
     }, []);
 
-    // Save liked videos to localStorage whenever the state changes
+    // Save watch later videos to localStorage whenever the state changes
     useEffect(() => {
-        const videoIds = likedVideos.map((video) => video.id);
-        localStorage.setItem("likedVideos", JSON.stringify(videoIds));
-    }, [likedVideos]);
+        const videoIds = watchLaterVideos.map((video) => video.id);
+        localStorage.setItem("watchLaterVideos", JSON.stringify(videoIds));
+    }, [watchLaterVideos]);
 
     const filteredVideos = useMemo(() => {
         if (!searchQuery) {
-            return likedVideos;
+            return watchLaterVideos;
         }
         const lowerCaseQuery = searchQuery.toLowerCase();
-        return likedVideos.filter(
+        return watchLaterVideos.filter(
             (video) =>
                 video.title.toLowerCase().includes(lowerCaseQuery) ||
                 video.channelName.toLowerCase().includes(lowerCaseQuery)
         );
-    }, [likedVideos, searchQuery]);
+    }, [watchLaterVideos, searchQuery]);
 
-    const handleClearLikedVideos = () => {
+    const handleClearWatchLater = () => {
         if (
-            window.confirm("Are you sure you want to clear all liked videos?")
+            window.confirm(
+                "Are you sure you want to clear all videos from Watch Later?"
+            )
         ) {
-            setLikedVideos([]);
+            setWatchLaterVideos([]);
         }
     };
 
     const handleRemoveVideo = (idToRemove) => {
-        setLikedVideos((prevVideos) =>
+        setWatchLaterVideos((prevVideos) =>
             prevVideos.filter((video) => video.id !== idToRemove)
         );
     };
 
     return (
         <div className="container mx-auto py-6 px-4 lg:px-6">
-            <h1 className="text-2xl font-bold mb-6">Liked Videos</h1>
-
+            <h1 className="text-2xl font-bold mb-6">Watch Later</h1>
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
-                {/* Main Liked Videos List */}
+                {/* Main Watch Later List */}
                 <div className="space-y-4">
                     {filteredVideos.length === 0 ? (
                         <p className="text-muted-foreground">
                             {searchQuery
-                                ? "No matching videos found in Liked Videos."
-                                : "No videos liked yet."}
+                                ? "No matching videos found in Watch Later."
+                                : "No videos saved for later."}
                         </p>
                     ) : (
                         filteredVideos.map((video) => (
-                            <LikedVideoCard
+                            <WatchLaterVideoCard
                                 key={video.id}
                                 id={video.id}
                                 thumbnail={video.thumbnail}
@@ -83,17 +86,17 @@ export default function LikedVideosPage() {
                     )}
                 </div>
 
-                {/* Liked Videos Sidebar */}
+                {/* Watch Later Sidebar */}
                 <div className="space-y-6 lg:border-l lg:pl-6">
-                    {/* Search Liked Videos Input */}
+                    {/* Search Watch Later Input */}
                     <div className="space-y-2">
                         <h3 className="font-semibold text-lg">
-                            Search Liked Videos
+                            Search Watch Later
                         </h3>
                         <div className="relative flex items-center">
                             <Input
                                 type="text"
-                                placeholder="Search liked videos"
+                                placeholder="Search saved videos"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="pr-8"
@@ -119,18 +122,18 @@ export default function LikedVideosPage() {
 
                     <hr className="border-border" />
 
-                    {/* Liked Videos Controls */}
+                    {/* Watch Later Controls */}
                     <div className="space-y-2">
                         <h3 className="font-semibold text-lg">
-                            Liked Videos Controls
+                            Watch Later Controls
                         </h3>
                         <Button
                             variant="ghost"
                             className="w-full justify-start"
-                            onClick={handleClearLikedVideos}
+                            onClick={handleClearWatchLater}
                         >
-                            <Trash2 className="mr-2 h-4 w-4" /> Clear all liked
-                            videos
+                            <Trash2 className="mr-2 h-4 w-4" /> Clear all Watch
+                            Later videos
                         </Button>
                     </div>
                 </div>

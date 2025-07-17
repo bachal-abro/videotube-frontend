@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/button";
 import { ThemeToggle } from "../components/theme-toggle";
 import { Input } from "../components/ui/Input"; // Import Input component
@@ -11,25 +11,27 @@ import {
 } from "../components/ui/popover";
 import { Menu, Search, X, Bell, User, Settings, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { setSidebarOpen } from "../features/system/systemSlice";
 
 const Header = () => {
+    
+    const dispatch = useDispatch();
     const { user } = useSelector((store) => store.auth);
-    const [sidebarOpen, setSidebarOpen] = useState(true); // Default open on desktop
     const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate()
     const handleSearch = (e) => {
         e.preventDefault();
         console.log("Searching for:", searchQuery);
-        // In a real app, you'd navigate or filter videos here
     };
+
     const handleRedirectToProfile = () => {
         navigate(`/@${user?.username}`);
-        
     };
+
     const handleLogOut = () => {
-        navigate('/logout');
-        
+        navigate('/logout');  
     };
+    
     return (
         <header className="sticky top-0 z-20 border-b header-gradient flex-shrink-0">
             <div className="container mx-auto py-3 px-4 flex items-center justify-between">
@@ -38,7 +40,7 @@ const Header = () => {
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setSidebarOpen(!sidebarOpen)}
+                        onClick={() => dispatch(setSidebarOpen())}
                         className="flex-shrink-0"
                     >
                         <Menu className="h-5 w-5" />
