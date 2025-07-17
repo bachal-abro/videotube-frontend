@@ -161,4 +161,190 @@
         overscroll-behavior: contain;
         -webkit-overflow-scrolling: touch;
     }
+
+    .bg-popover {
+        background: hsl(var(--popover));
+    }
+
+    .dark .bg-popover {
+        background: hsl(var(--popover));
+    }
+
+    .text-popover-foreground {
+        color: hsl(var(--popover-foreground));
+    }
+
+    .dark .text-popover-foreground {
+        color: hsl(var(--popover-foreground));
+    }
+
+    .bg-input {
+        background: hsl(var(--input));
+    }
+    .dark .bg-input {
+        background: hsl(var(--input));
+    }
+
+    /* Background classes */
+    .bg-background {
+        background: hsl(var(--background));
+    }
+    .dark .bg-background {
+        background: hsl(var(--background));
+    }
+
+    .bg-foreground {
+        background: hsl(var(--foreground));
+    }
+    .dark .bg-foreground {
+        background: hsl(var(--foreground));
+    }
+
+    .bg-card {
+        background: hsl(var(--card));
+    }
+    .dark .bg-card {
+        background: hsl(var(--card));
+    }
+
+    .bg-popover {
+        background: hsl(var(--popover));
+    }
+    .dark .bg-popover {
+        background: hsl(var(--popover));
+    }
+
+    .bg-primary {
+        background: hsl(var(--primary));
+    }
+    .dark .bg-primary {
+        background: hsl(var(--primary));
+    }
+
+    .bg-secondary {
+        background: hsl(var(--secondary));
+    }
+    .dark .bg-secondary {
+        background: hsl(var(--secondary));
+    }
+
+    .bg-muted {
+        background: hsl(var(--muted));
+    }
+    .dark .bg-muted {
+        background: hsl(var(--muted));
+    }
+
+    .bg-accent {
+        background: hsl(var(--accent));
+    }
+    .dark .bg-accent {
+        background: hsl(var(--accent));
+    }
+
+    .bg-destructive {
+        background: hsl(var(--destructive));
+    }
+    .dark .bg-destructive {
+        background: hsl(var(--destructive));
+    }
+
+    .bg-border {
+        background: hsl(var(--border));
+    }
+    .dark .bg-border {
+        background: hsl(var(--border));
+    }
+
+    .bg-input {
+        background: hsl(var(--input));
+    }
+    .dark .bg-input {
+        background: hsl(var(--input));
+    }
+
+    .bg-ring {
+        background: hsl(var(--ring));
+    }
+    .dark .bg-ring {
+        background: hsl(var(--ring));
+    }
+
+    /* Text color (foreground) classes */
+    .text-background {
+        color: hsl(var(--background));
+    }
+    .dark .text-background {
+        color: hsl(var(--background));
+    }
+
+    .text-foreground {
+        color: hsl(var(--foreground));
+    }
+    .dark .text-foreground {
+        color: hsl(var(--foreground));
+    }
+
+    .text-card-foreground {
+        color: hsl(var(--card-foreground));
+    }
+    .dark .text-card-foreground {
+        color: hsl(var(--card-foreground));
+    }
+
+    .text-popover-foreground {
+        color: hsl(var(--popover-foreground));
+    }
+    .dark .text-popover-foreground {
+        color: hsl(var(--popover-foreground));
+    }
+
+    .text-primary-foreground {
+        color: hsl(var(--primary-foreground));
+    }
+    .dark .text-primary-foreground {
+        color: hsl(var(--primary-foreground));
+    }
+
+    .text-secondary-foreground {
+        color: hsl(var(--secondary-foreground));
+    }
+    .dark .text-secondary-foreground {
+        color: hsl(var(--secondary-foreground));
+    }
+
+    .text-muted-foreground {
+        color: hsl(var(--muted-foreground));
+    }
+    .dark .text-muted-foreground {
+        color: hsl(var(--muted-foreground));
+    }
+
+    .text-accent-foreground {
+        color: hsl(var(--accent-foreground));
+    }
+    .dark .text-accent-foreground {
+        color: hsl(var(--accent-foreground));
+    }
+
+    .text-destructive-foreground {
+        color: hsl(var(--destructive-foreground));
+    }
+    .dark .text-destructive-foreground {
+        color: hsl(var(--destructive-foreground));
+    }
+
+    .border-input {
+        border-color: hsl(var(--input));
+    }
+    .dark .border-input {
+        border-color: hsl(var(--input));
+    }
+
+    .ring-ring {
+        box-shadow: 0 0 0 3px hsl(var(--ring));
+    }
+    .dark .ring-ring {
+        box-shadow: 0 0 0 3px hsl(var(--ring));
+    }
 }

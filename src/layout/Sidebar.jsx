@@ -19,7 +19,7 @@ const Sidebar = () => {
                             `flex items-center gap-2 px-4 py-3 ${
                                 isActive
                                     ? "border-s-[3px] border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-50"
-                                    : "border-gray-100 border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                                    : "border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
                             }`
                         }
                     >
@@ -34,7 +34,7 @@ const Sidebar = () => {
                             `flex items-center gap-2 px-4 py-3 ${
                                 isActive
                                     ? "border-s-[3px] border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-50"
-                                    : "border-gray-100 border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                                    : " border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
                             }`
                         }
                     >
@@ -53,7 +53,7 @@ const Sidebar = () => {
                             `flex items-center gap-2 px-4 py-3 ${
                                 isActive
                                     ? "border-s-[3px] border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-50"
-                                    : "border-gray-100 border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                                    : " border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
                             }`
                         }
                     >
@@ -73,7 +73,7 @@ const Sidebar = () => {
                             `flex items-center gap-2 px-4 py-3 ${
                                 isActive
                                     ? "border-s-[3px] border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-50"
-                                    : "border-gray-100 border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                                    : " border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
                             }`
                         }
                     >
@@ -89,7 +89,7 @@ const Sidebar = () => {
                             `flex items-center gap-2 px-4 py-3 ${
                                 isActive
                                     ? "border-s-[3px] border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-50"
-                                    : "border-gray-100 border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                                    : " border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
                             }`
                         }
                     >
@@ -108,7 +108,7 @@ const Sidebar = () => {
                             `flex items-center gap-2 px-4 py-3 ${
                                 isActive
                                     ? "border-s-[3px] border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-50"
-                                    : "border-gray-100 border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                                    : " border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
                             }`
                         }
                     >
@@ -124,7 +124,7 @@ const Sidebar = () => {
                             `flex items-center gap-2 px-4 py-3 ${
                                 isActive
                                     ? "border-s-[3px] border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-50"
-                                    : "border-gray-100 border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                                    : " border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
                             }`
                         }
                     >

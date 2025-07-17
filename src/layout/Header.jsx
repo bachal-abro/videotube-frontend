@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/button";
 import { ThemeToggle } from "../components/theme-toggle";
-import { Input } from "../components/ui/Input"; // Import Input component
+import { Input } from "../components/ui/input"; 
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"; // Import Avatar components
 import {
     Popover,
@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom";
 import { setSidebarOpen } from "../features/system/systemSlice";
 
 const Header = () => {
-    
     const dispatch = useDispatch();
     const { user } = useSelector((store) => store.auth);
     const [searchQuery, setSearchQuery] = useState("");
