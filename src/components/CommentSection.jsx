@@ -22,8 +22,15 @@ const CommentSection = () => {
     const commentsList = useSelector(
         (store) => store.comments.currentVideoComments
     );
-    const { data, isSuccess, isLoading, refetch } =
-        useGetVideoCommentsQuery(videoId);
+    const [page, setPage] = useState(1);
+    const { data, isSuccess, isFetching, isLoading, isError, refetch } =
+        useGetVideoCommentsQuery({ videoId, page, limit: 10 });
+
+    const comments = data?.data || [];
+    let hasNextPage = false;
+
+    // const hasNextPage = data?.pagination?.hasNextPage;
+
     const [
         createVideoComment,
         { isSuccess: newCommentSuccess, isLoading: newCommentLoading },
@@ -31,10 +38,29 @@ const CommentSection = () => {
 
     useEffect(() => {
         if (isSuccess && data?.data) {
+            hasNextPage =
+                data?.pagination?.totalCommentsCount - (page * 10)
+                    ? true
+                    : false;
+
             dispatch(setCurrentVideoComments(data.data));
+            const handleScroll = () => {
+                if (
+                    window.innerHeight + window.scrollY >=
+                        document.body.offsetHeight - 200 &&
+                    !isFetching &&
+                    hasNextPage
+                ) {
+                    dispatch(setCurrentVideoComments(data.data));
+                    setPage((prev) => prev + 1);
+                }
+            };
+
+            window.addEventListener("scroll", handleScroll);
+            return () => window.removeEventListener("scroll", handleScroll);
             console.log(data);
         }
-    }, [isSuccess, data, dispatch]);
+    }, [isSuccess, data, isFetching, hasNextPage]);
 
     const handlePostComment = async (e) => {
         e.preventDefault();

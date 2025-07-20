@@ -4,9 +4,18 @@ export const videoCommentsApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         // 🟢 GET comments for a video
         getVideoComments: builder.query({
-            query: (videoId) => `/comments/${videoId}`,
+            query: ({ videoId, page = 1, limit = 10 }) =>
+                `/comments/${videoId}?page=${page}&limit=${limit}`,
+            serializeQueryArgs: ({ endpointName }) => endpointName, // persist cache per endpoint
+            merge: (currentCache, newItems) => {
+                currentCache.data.push(...newItems.data);
+                currentCache.pagination = newItems.pagination;
+            },
+            forceRefetch({ currentArg, previousArg }) {
+                return currentArg?.page !== previousArg?.page;
+            },
         }),
-
+        
         // 🟢 CREATE new comment or reply
         createVideoComment: builder.mutation({
             query: ({ videoId, content, parentCommentId }) => ({
