@@ -11,6 +11,7 @@ import { setCurrentVideoComments } from "../features/comments/commentSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useToast } from "../hooks/use-toast";
+import { useToggleCommentLikeMutation } from "../features/likes/likesApiSlice";
 
 function CommentItem({ comment, hasParent }) {
     const dispatch = useDispatch();
@@ -21,17 +22,22 @@ function CommentItem({ comment, hasParent }) {
         { isSuccess: newCommentSuccess, isLoading: newCommentLoading },
     ] = useCreateVideoCommentMutation();
 
+    const [toggleCommentLike] = useToggleCommentLikeMutation();
+    const [showReplies, setShowReplies] = useState(false);
     const commentsList = useSelector(
         (store) => store.comments.currentVideoComments
     );
-
+    const { user } = useSelector((store) => store.auth);
+    const HandleShowReplies = () => {
+        setShowReplies((prev) => !prev);
+    };
     // Inside component
     const replies = useMemo(() => {
-        return commentsList.filter((c) => c.parentComment === comment._id)
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        
+        return commentsList
+            .filter((c) => c.parentComment === comment._id)
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }, [commentsList, comment._id]);
-    
+
     const [showReplyInput, setShowReplyInput] = useState(false);
     const [replyText, setReplyText] = useState("");
     const handlePostReply = async (e) => {
@@ -51,6 +57,54 @@ function CommentItem({ comment, hasParent }) {
             });
         } catch (error) {
             console.error("Failed to toggle like:", error);
+        }
+    };
+
+    const handleToggleLike = async (e) => {
+        e.preventDefault();
+        try {
+            const updatedLike = await toggleCommentLike(comment?._id).unwrap();
+            const newObj = {
+                _id: comment?._id,
+                content: comment?.content,
+                video: comment?.video,
+                parentComment: comment?.parentComment,
+                owner: {
+                    _id: user?._id,
+                    username: user?.username,
+                    fullName: user?.fullName,
+                    avatar: user?.avatar,
+                },
+                createdAt: comment?.createdAt,
+                updatedAt: comment?.updatedAt,
+                __v: 0,
+                likes: updatedLike?.data?.likes,
+                isLiked: updatedLike?.data?.isLiked,
+            };
+            const index = commentsList.findIndex((c) => c._id === newObj._id);
+            const updatedComments =
+                index !== -1
+                    ? commentsList.map((c) =>
+                          c._id === newObj._id ? newObj : c
+                      )
+                    : [...commentsList, newObj];
+            dispatch(setCurrentVideoComments(updatedComments));
+            if (comment?.isLiked) {
+                toast({
+                    title: "Unliked comment",
+                    description: comment?.content?.slice(0, 12),
+                });
+            } else {
+                toast({
+                    title: "Liked comment",
+                    description: comment?.content?.slice(0, 12),
+                });
+            }
+        } catch (error) {
+            toast({
+                title: "Operation failed",
+                description: error,
+            });
         }
     };
 
@@ -86,7 +140,12 @@ function CommentItem({ comment, hasParent }) {
 
                 {/* Action Buttons (Like, Dislike, Reply) */}
                 <div className="flex items-center gap-3 text-xs">
-                    <Button variant="ghost" size="sm" className="h-6 px-2">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2"
+                        onClick={(e) => handleToggleLike(e)}
+                    >
                         <ThumbsUp className="mr-1 h-3 w-3" /> {comment?.likes}
                     </Button>
                     <Button variant="ghost" size="sm" className="h-6 px-2">
@@ -107,8 +166,8 @@ function CommentItem({ comment, hasParent }) {
                     <div className="flex gap-3 mt-4">
                         <Avatar className="h-8 w-8 flex-shrink-0">
                             <AvatarImage
-                                src="/placeholder.svg?height=32&width=32"
-                                alt="Your avatar"
+                                src={comment?.owner?.avatar}
+                                alt={comment?.owner?.fullName}
                             />
                             <AvatarFallback>U</AvatarFallback>
                         </Avatar>
@@ -140,13 +199,30 @@ function CommentItem({ comment, hasParent }) {
                 )}
 
                 {/* Nested Replies */}
-                {replies.map((reply) => (
-                    <CommentItem
-                        key={reply._id}
-                        hasParent={reply.parentComment}
-                        comment={reply}
-                    />
-                ))}
+                <button
+                    type="button"
+                    onClick={HandleShowReplies}
+                    className="ml-20 flex pb-2 gap-1 justify-center items-center rounded-full text-black font-light dark:text-blue-500 border-gray-200 dark:hover:text-blue-400"
+                >
+                    {replies.length
+                        ? `${replies.length} ${
+                              replies.length > 1 ? "Replies" : "Reply"
+                          }`
+                        : ""}
+                </button>
+                <div
+                    className={`${
+                        showReplies ? "" : "hidden"
+                    } flex flex-col gap-2`}
+                >
+                    {replies.map((reply) => (
+                        <CommentItem
+                            key={reply._id}
+                            hasParent={reply.parentComment}
+                            comment={reply}
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     );
