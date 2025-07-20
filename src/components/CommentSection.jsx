@@ -12,7 +12,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Button } from "../components/ui/button";
 import { timeAgo } from "../utils/timeAgo";
 import { useToast } from "../hooks/use-toast";
-// import { CommentItem } from "./comment-item";
 import CommentItem from "./CommentItem";
 const CommentSection = () => {
     const { toast } = useToast();
@@ -23,10 +22,10 @@ const CommentSection = () => {
         (store) => store.comments.currentVideoComments
     );
     const [page, setPage] = useState(1);
+    const { user } = useSelector((store) => store.auth);
     const { data, isSuccess, isFetching, isLoading, isError, refetch } =
         useGetVideoCommentsQuery({ videoId, page, limit: 10 });
 
-    const comments = data?.data || [];
     let hasNextPage = false;
 
     // const hasNextPage = data?.pagination?.hasNextPage;
@@ -39,9 +38,7 @@ const CommentSection = () => {
     useEffect(() => {
         if (isSuccess && data?.data) {
             hasNextPage =
-                data?.pagination?.totalCommentsCount - (page * 10)
-                    ? true
-                    : false;
+                data?.pagination?.totalCommentsCount - page * 10 ? true : false;
 
             dispatch(setCurrentVideoComments(data.data));
             const handleScroll = () => {
@@ -71,8 +68,8 @@ const CommentSection = () => {
                     content: commentText,
                 }).unwrap();
 
-                // Option 1: Refetch comments (Recommended for consistency)
-                refetch(); // <-- you can get this from the query hook below
+                // Refetch comments (Recommended for consistency)
+                refetch();
                 console.log(newComment);
                 setCommentText("");
                 toast({
@@ -101,10 +98,7 @@ const CommentSection = () => {
             {/* Comment input */}
             <div className="flex gap-3">
                 <Avatar className="h-8 w-8">
-                    <AvatarImage
-                        src="https://placehold.co/32x32"
-                        alt="Your avatar"
-                    />
+                    <AvatarImage src={user?.avatar} alt={user?.username} />
                     <AvatarFallback>YA</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 space-y-2">

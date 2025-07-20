@@ -32,6 +32,7 @@ import { setCurrentVideo } from "../features/videos/videoSlice";
 import { useGetVideoByIdQuery } from "../features/videos/videosApiSlice";
 import { timeAgo } from "../utils/timeAgo";
 import { useToggleVideoLikeMutation } from "../features/likes/likesApiSlice";
+import { useToggleVideoDislikeMutation } from "../features/dislikes/dislikesApiSlice";
 import { useToggleSubscriptionMutation } from "../features/subscription/subscriptionApiSlice";
 import CommentSection from "../components/CommentSection";
 
@@ -51,6 +52,7 @@ export default function VideoDetailPage() {
         useGetVideoByIdQuery(videoId);
     const video = useSelector((store) => store.video.currentVideo);
     const [toggleVideoLike] = useToggleVideoLikeMutation();
+    const [toggleVideoDislike] = useToggleVideoDislikeMutation();
     const [toggleSubscription] = useToggleSubscriptionMutation();
 
     useEffect(() => {
@@ -124,72 +126,41 @@ export default function VideoDetailPage() {
                 title: "Liked video",
                 description: video.title,
             });
-
-            // // If currently disliked, remove dislike
-            // if (isDisliked) {
-            //     dislikedVideoIds = dislikedVideoIds.filter(
-            //         (videoId) => videoId !== video.id
-            //     );
-            //     setDislikeCount((prev) => prev - 1);
-            //     setIsDisliked(false);
-            //     localStorage.setItem(
-            //         "dislikedVideos",
-            //         JSON.stringify(dislikedVideoIds)
-            //     );
-            // }
         }
     };
 
-    const handleToggleDislike = (e) => {
-        const storedDislikedVideos = localStorage.getItem("dislikedVideos");
-        let dislikedVideoIds = storedDislikedVideos
-            ? JSON.parse(storedDislikedVideos)
-            : [];
+    const handleToggleDislike = async (e) => {
+        e.preventDefault();
+        const updatedDislike = await toggleVideoDislike(video?._id).unwrap();
 
-        const storedLikedVideos = localStorage.getItem("likedVideos");
-        let likedVideoIds = storedLikedVideos
-            ? JSON.parse(storedLikedVideos)
-            : [];
-
-        if (isDisliked) {
-            // Undislike video
-            dislikedVideoIds = dislikedVideoIds.filter(
-                (videoId) => videoId !== video.id
+        if (video?.isDisliked) {
+            dispatch(
+                setCurrentVideo({
+                    ...video,
+                    isDisliked: updatedDislike?.data?.isDisliked,
+                    dislikes: updatedDislike?.data?.dislikes,
+                })
             );
-            setDislikeCount((prev) => prev - 1);
+
             toast({
-                title: "Removed dislike",
+                title: "Video dislike removed",
                 description: video.title,
             });
         } else {
             // Dislike video
-            if (!dislikedVideoIds.includes(video.id)) {
-                dislikedVideoIds.push(video.id);
-            }
-            setDislikeCount((prev) => prev + 1);
+            dispatch(
+                setCurrentVideo({
+                    ...video,
+                    isDisliked: updatedDislike?.data?.isDisliked,
+                    dislikes: updatedDislike?.data?.dislikes,
+                })
+            );
+
             toast({
                 title: "Disliked video",
                 description: video.title,
             });
-
-            // If currently liked, remove like
-            if (isLiked) {
-                likedVideoIds = likedVideoIds.filter(
-                    (videoId) => videoId !== video.id
-                );
-                setLikeCount((prev) => prev - 1);
-                setIsLiked(false);
-                localStorage.setItem(
-                    "likedVideos",
-                    JSON.stringify(likedVideoIds)
-                );
-            }
         }
-        localStorage.setItem(
-            "dislikedVideos",
-            JSON.stringify(dislikedVideoIds)
-        );
-        setIsDisliked(!isDisliked);
     };
 
     const handleShare = () => {
