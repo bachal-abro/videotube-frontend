@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useToast } from "../hooks/use-toast";
 import { useToggleCommentLikeMutation } from "../features/likes/likesApiSlice";
+import { useToggleCommentDislikeMutation } from "../features/dislikes/dislikesApiSlice";
 
 function CommentItem({ comment, hasParent }) {
     const dispatch = useDispatch();
@@ -23,6 +24,7 @@ function CommentItem({ comment, hasParent }) {
     ] = useCreateVideoCommentMutation();
 
     const [toggleCommentLike] = useToggleCommentLikeMutation();
+    const [toggleCommentDislike] = useToggleCommentDislikeMutation();
     const [showReplies, setShowReplies] = useState(false);
     const commentsList = useSelector(
         (store) => store.comments.currentVideoComments
@@ -108,6 +110,60 @@ function CommentItem({ comment, hasParent }) {
         }
     };
 
+    const handleToggleDislike = async (e) => {
+        e.preventDefault();
+        try {
+            const updatedDislike = await toggleCommentDislike(
+                comment?._id
+            ).unwrap();
+            
+            const newObj = {
+                _id: comment?._id,
+                content: comment?.content,
+                video: comment?.video,
+                parentComment: comment?.parentComment,
+                owner: {
+                    _id: user?._id,
+                    username: user?.username,
+                    fullName: user?.fullName,
+                    avatar: user?.avatar,
+                },
+                createdAt: comment?.createdAt,
+                updatedAt: comment?.updatedAt,
+                __v: 0,
+                likes: comment?.likes,
+                isLiked: comment?.isLiked,
+                dislikes: updatedDislike?.data?.dislikes,
+                isDisliked: updatedDislike?.data?.isDisliked,
+            };
+
+            const index = commentsList.findIndex((c) => c._id === newObj._id);
+            const updatedComments =
+                index !== -1
+                    ? commentsList.map((c) =>
+                          c._id === newObj._id ? newObj : c
+                      )
+                    : [...commentsList, newObj];
+            dispatch(setCurrentVideoComments(updatedComments));
+            if (comment?.isDisliked) {
+                toast({
+                    title: "Comment dislike removed",
+                    description: comment?.content?.slice(0, 12),
+                });
+            } else {
+                toast({
+                    title: "Disliked comment",
+                    description: comment?.content?.slice(0, 12),
+                });
+            }
+        } catch (error) {
+            toast({
+                title: "Operation failed",
+                description: error,
+            });
+        }
+    };
+
     // Determine avatar and content indentation based on nestingLevel
     const paddingLeftClass = hasParent ? "pl-8 sm:pl-12" : "";
 
@@ -148,8 +204,14 @@ function CommentItem({ comment, hasParent }) {
                     >
                         <ThumbsUp className="mr-1 h-3 w-3" /> {comment?.likes}
                     </Button>
-                    <Button variant="ghost" size="sm" className="h-6 px-2">
-                        <ThumbsDown className="mr-1 h-3 w-3" />
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2"
+                        onClick={(e) => handleToggleDislike(e)}
+                    >
+                        <ThumbsDown className="mr-1 h-3 w-3" />{" "}
+                        {comment?.dislikes}
                     </Button>
                     <Button
                         variant="ghost"
