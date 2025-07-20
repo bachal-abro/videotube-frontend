@@ -8,7 +8,6 @@ import {
     Download,
     MoreHorizontal,
     Bell,
-    Send,
     Plus,
     Flag,
     FileText,
@@ -18,7 +17,6 @@ import {
 import { cn } from "../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Button } from "../components/ui/button";
-import { Textarea } from "../components/ui/textarea";
 import { VideoCard } from "../components/video-card";
 import { AddToPlaylistDialog } from "../components/AddToPlaylistDialog";
 import {
@@ -33,6 +31,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { setCurrentVideo } from "../features/videos/videoSlice";
 import { useGetVideoByIdQuery } from "../features/videos/videosApiSlice";
 import { timeAgo } from "../utils/timeAgo";
+import { useToggleVideoLikeMutation } from "../features/likes/likesApiSlice";
+import { useToggleSubscriptionMutation } from "../features/subscription/subscriptionApiSlice";
+import CommentSection from "../components/CommentSection";
 
 export default function VideoDetailPage() {
     const { toast } = useToast();
@@ -43,17 +44,14 @@ export default function VideoDetailPage() {
     const [isSavedToWatchLater, setIsSavedToWatchLater] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
     const [isDisliked, setIsDisliked] = useState(false); // New state for disliked status
-    const [likeCount, setLikeCount] = useState(0);
-    const [dislikeCount, setDislikeCount] = useState(0); // New state for dislike count
     const [isAddToPlaylistDialogOpen, setIsAddToPlaylistDialogOpen] =
         useState(false);
     const [showFullDescription, setShowFullDescription] = useState(false); // State for description expansion
-    const [commentText, setCommentText] = useState(""); // State for comment input
-    const [isSubscribed, setIsSubscribed] = useState(false); // State for subscribe button
-
     const { data, isLoading, isSuccess, isError, error } =
         useGetVideoByIdQuery(videoId);
     const video = useSelector((store) => store.video.currentVideo);
+    const [toggleVideoLike] = useToggleVideoLikeMutation();
+    const [toggleSubscription] = useToggleSubscriptionMutation();
 
     useEffect(() => {
         if (data && isSuccess) {
@@ -69,26 +67,6 @@ export default function VideoDetailPage() {
                 const videoIds = JSON.parse(storedWatchLaterVideos);
                 setIsSavedToWatchLater(videoIds.includes(video._id));
             }
-
-            // Check if video is already liked
-            const storedLikedVideos = localStorage.getItem("likedVideos");
-            if (storedLikedVideos) {
-                const likedVideoIds = JSON.parse(storedLikedVideos);
-                setIsLiked(likedVideoIds.includes(video._id));
-            }
-
-            // Check if video is already disliked (for persistent state)
-            const storedDislikedVideos = localStorage.getItem("dislikedVideos");
-            if (storedDislikedVideos) {
-                const dislikedVideoIds = JSON.parse(storedDislikedVideos);
-                setIsDisliked(dislikedVideoIds.includes(video._id));
-            }
-
-            // Simulate subscription status
-            const storedSubscription = localStorage.getItem(
-                `subscribed-${video?.owner?.username}`
-            );
-            setIsSubscribed(storedSubscription === "true");
         }
     }, [videoId, isSuccess, isLoading]);
 
@@ -115,56 +93,54 @@ export default function VideoDetailPage() {
         setIsSavedToWatchLater(!isSavedToWatchLater);
     };
 
-    const handleToggleLike = () => {
-        const storedLikedVideos = localStorage.getItem("likedVideos");
-        let likedVideoIds = storedLikedVideos
-            ? JSON.parse(storedLikedVideos)
-            : [];
+    const handleToggleLike = async (e) => {
+        e.preventDefault();
+        const updatedLike = await toggleVideoLike(video?._id).unwrap();
 
-        const storedDislikedVideos = localStorage.getItem("dislikedVideos");
-        let dislikedVideoIds = storedDislikedVideos
-            ? JSON.parse(storedDislikedVideos)
-            : [];
-
-        if (isLiked) {
-            // Unlike video
-            likedVideoIds = likedVideoIds.filter(
-                (videoId) => videoId !== video.id
+        if (video?.isLiked) {
+            dispatch(
+                setCurrentVideo({
+                    ...video,
+                    isLiked: updatedLike?.data?.isLiked,
+                    likes: updatedLike?.data?.likes,
+                })
             );
-            setLikeCount((prev) => prev - 1);
+
             toast({
                 title: "Unliked video",
                 description: video.title,
             });
         } else {
             // Like video
-            if (!likedVideoIds.includes(video.id)) {
-                likedVideoIds.push(video.id);
-            }
-            setLikeCount((prev) => prev + 1);
+            dispatch(
+                setCurrentVideo({
+                    ...video,
+                    isLiked: updatedLike?.data?.isLiked,
+                    likes: updatedLike?.data?.likes,
+                })
+            );
+
             toast({
                 title: "Liked video",
                 description: video.title,
             });
 
-            // If currently disliked, remove dislike
-            if (isDisliked) {
-                dislikedVideoIds = dislikedVideoIds.filter(
-                    (videoId) => videoId !== video.id
-                );
-                setDislikeCount((prev) => prev - 1);
-                setIsDisliked(false);
-                localStorage.setItem(
-                    "dislikedVideos",
-                    JSON.stringify(dislikedVideoIds)
-                );
-            }
+            // // If currently disliked, remove dislike
+            // if (isDisliked) {
+            //     dislikedVideoIds = dislikedVideoIds.filter(
+            //         (videoId) => videoId !== video.id
+            //     );
+            //     setDislikeCount((prev) => prev - 1);
+            //     setIsDisliked(false);
+            //     localStorage.setItem(
+            //         "dislikedVideos",
+            //         JSON.stringify(dislikedVideoIds)
+            //     );
+            // }
         }
-        localStorage.setItem("likedVideos", JSON.stringify(likedVideoIds));
-        setIsLiked(!isLiked);
     };
 
-    const handleToggleDislike = () => {
+    const handleToggleDislike = (e) => {
         const storedDislikedVideos = localStorage.getItem("dislikedVideos");
         let dislikedVideoIds = storedDislikedVideos
             ? JSON.parse(storedDislikedVideos)
@@ -241,28 +217,30 @@ export default function VideoDetailPage() {
         }
     };
 
-    const handlePostComment = () => {
-        if (commentText.trim()) {
-            console.log("Posting comment:", commentText);
-            toast({
-                title: "Comment posted!",
-                description: "Your comment has been added.",
-            });
-            setCommentText(""); // Clear input after posting
-        }
-    };
+    const handleToggleSubscribe = async () => {
+        const updatedSubscription = await toggleSubscription(
+            video?.owner?._id
+        ).unwrap();
 
-    const handleToggleSubscribe = () => {
-        setIsSubscribed(!isSubscribed);
-        localStorage.setItem(`subscribed-${video.channelName}`, !isSubscribed);
+        // Dispatch the new state
+        const updatedVideo = {
+            ...video,
+            owner: {
+                ...video.owner,
+                subscribers: updatedSubscription.data?.subscribersCount, // your updated value
+                isSubscribed: updatedSubscription.data?.isSubscribed, // true or false
+            },
+        };
+
         toast({
-            title: isSubscribed
-                ? `Unsubscribed from ${video.channelName}`
-                : `Subscribed to ${video.channelName}`,
-            description: isSubscribed
+            title: video?.owner?.isSubscribed
+                ? `Unsubscribed from ${video?.owner?.fullName}`
+                : `Subscribed to ${video?.owner?.fullName}`,
+            description: video?.owner?.isSubscribed
                 ? "You will no longer receive notifications."
                 : "You will now receive notifications.",
         });
+        dispatch(setCurrentVideo(updatedVideo));
     };
 
     // Callback for when video is saved/removed from playlists
@@ -292,9 +270,9 @@ export default function VideoDetailPage() {
         (video.description && video.description.length > 200); // Arbitrary length for truncation
 
     if (isLoading || !isSuccess || !video.title) {
-        return <p>Video is loading</p>
+        return <p>Video is loading</p>;
     }
-    
+
     return (
         <div className="container mx-auto py-6 px-4 lg:px-6">
             <Button
@@ -350,18 +328,22 @@ export default function VideoDetailPage() {
                                 </div>
                                 <Button
                                     variant={
-                                        video.owner.isSubscribed ? "secondary" : "outline"
+                                        video.owner.isSubscribed
+                                            ? "secondary"
+                                            : "outline"
                                     }
                                     size="sm"
                                     className="ml-2 bg-transparent"
-                                    onClick={handleToggleSubscribe}
+                                    onClick={(e) => handleToggleSubscribe(e)}
                                 >
                                     {video.owner.isSubscribed ? (
                                         <Check className="mr-2 h-4 w-4" />
                                     ) : (
                                         <Bell className="mr-2 h-4 w-4" />
                                     )}{" "}
-                                    {video.owner.isSubscribed ? "Subscribed" : "Subscribe"}
+                                    {video.owner.isSubscribed
+                                        ? "Subscribed"
+                                        : "Subscribe"}
                                 </Button>
                             </div>
 
@@ -374,10 +356,11 @@ export default function VideoDetailPage() {
                                         video.isLiked &&
                                             "bg-primary text-primary-foreground hover:bg-primary/90"
                                     )}
-                                    onClick={handleToggleLike}
+                                    onClick={(e) => handleToggleLike(e)}
+                                    type="submit"
                                 >
                                     <ThumbsUp className="mr-2 h-4 w-4" />{" "}
-                                    {video?.likeCount?.toLocaleString()}
+                                    {video?.likes?.toLocaleString()}
                                 </Button>
                                 <Button
                                     variant="secondary"
@@ -387,10 +370,11 @@ export default function VideoDetailPage() {
                                         video.isDisliked &&
                                             "bg-primary text-primary-foreground hover:bg-primary/90"
                                     )}
-                                    onClick={handleToggleDislike}
+                                    onClick={(e) => handleToggleDislike(e)}
+                                    type="submit"
                                 >
                                     <ThumbsDown className="mr-2 h-4 w-4" />{" "}
-                                    {dislikeCount?.toLocaleString()}
+                                    {video?.dislikes?.toLocaleString()}
                                 </Button>
                                 <Button
                                     variant="secondary"
@@ -474,109 +458,7 @@ export default function VideoDetailPage() {
                         </div>
 
                         {/* Comments section */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2">
-                                <h3 className="font-medium">Comments</h3>
-                                <span className="text-sm text-muted-foreground">
-                                    1.2K
-                                </span>
-                            </div>
-
-                            {/* Comment input */}
-                            <div className="flex gap-3">
-                                <Avatar className="h-8 w-8">
-                                    <AvatarImage
-                                        src="https://placehold.co/32x32"
-                                        alt="Your avatar"
-                                    />
-                                    <AvatarFallback>YA</AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1 space-y-2">
-                                    <Textarea
-                                        placeholder="Add a comment..."
-                                        className="resize-none"
-                                        value={commentText}
-                                        onChange={(e) =>
-                                            setCommentText(e.target.value)
-                                        }
-                                    />
-                                    <div className="flex justify-end gap-2">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => setCommentText("")}
-                                        >
-                                            Cancel
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            onClick={handlePostComment}
-                                            disabled={!commentText.trim()}
-                                        >
-                                            <Send className="mr-2 h-4 w-4" />{" "}
-                                            Comment
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Comments list */}
-                            <div className="space-y-4 pt-4">
-                                {[1, 2, 3].map((comment) => (
-                                    <div key={comment} className="flex gap-3">
-                                        <Avatar className="h-8 w-8">
-                                            <AvatarImage
-                                                src={`https://placehold.co/32x32?text=U${comment}`}
-                                                alt="User avatar"
-                                            />
-                                            <AvatarFallback>
-                                                U{comment}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <div className="space-y-1">
-                                            <div className="flex items-center gap-2">
-                                                <span className="font-medium text-sm">
-                                                    User {comment}
-                                                </span>
-                                                <span className="text-xs text-muted-foreground">
-                                                    {comment} days ago
-                                                </span>
-                                            </div>
-                                            <p className="text-sm">
-                                                This is an amazing video! I
-                                                learned so much from it and
-                                                can't wait to apply these
-                                                techniques in my own projects.
-                                            </p>
-                                            <div className="flex items-center gap-3 text-xs">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-6 px-2"
-                                                >
-                                                    <ThumbsUp className="mr-1 h-3 w-3" />{" "}
-                                                    {comment * 24}
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-6 px-2"
-                                                >
-                                                    <ThumbsDown className="mr-1 h-3 w-3" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-6 px-2"
-                                                >
-                                                    Reply
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <CommentSection />
                     </div>
                 </div>
 

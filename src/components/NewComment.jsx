@@ -23,6 +23,7 @@ const NewComment = () => {
                 videoId,
                 content,
             }).unwrap();
+            console.log(newComment);
             // Todo: Adjust in backend to make it work:
             const newObj = {
                 _id: newComment?.data._id,
