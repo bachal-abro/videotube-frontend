@@ -177,13 +177,28 @@ export default function VideoDetailPage() {
     };
 
     const handleDownload = () => {
-        if (video && video.videoPreview) {
-            // In a real app, this would trigger a server-side download or a direct file download.
-            // For simulation, we'll just open the video URL in a new tab.
-            window.open(video.videoPreview, "_blank");
+        if (video && video.videoFile) {
+            // Sanitize filename (remove special chars, spaces, etc.)
+            const sanitizedTitle = (video.title || "video")
+                .replace(/[^a-z0-9]/gi, "_") // Replace non-alphanumeric chars with underscore
+                .toLowerCase();
+
+            // Inject fl_attachment:filename into the Cloudinary URL
+            const downloadUrl = video.videoFile.replace(
+                "/upload/",
+                `/upload/fl_attachment:${sanitizedTitle}/`
+            );
+
+            const link = document.createElement("a");
+            link.href = downloadUrl;
+            link.setAttribute("download", `${sanitizedTitle}.mp4`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
             toast({
-                title: "Download initiated",
-                description: "Video download should start shortly.",
+                title: "Download started",
+                description: `Your video "${video.title}" is being downloaded.`,
             });
         }
     };
