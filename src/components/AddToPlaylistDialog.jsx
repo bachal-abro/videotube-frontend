@@ -12,65 +12,113 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { Plus } from "lucide-react";
+import {
+    useAddVideoToPlaylistMutation,
+    useCreatePlaylistMutation,
+    useGetUserPlaylistsQuery,
+    useRemoveVideoFromPlaylistMutation,
+} from "../features/playlist/playlistsApiSlice";
+import { useSelector } from "react-redux";
 
 export function AddToPlaylistDialog({ isOpen, onOpenChange, video, onSave }) {
-    const [playlists, setPlaylists] = useState([]);
     const [selectedPlaylists, setSelectedPlaylists] = useState({});
     const [newPlaylistName, setNewPlaylistName] = useState("");
     const [showNewPlaylistInput, setShowNewPlaylistInput] = useState(false);
+    const [initialSelectedPlaylists, setInitialSelectedPlaylists] = useState(
+        {}
+    );
+    const user = useSelector((store) => store.auth.user);
+    const userId = user?._id;
+
+    const {
+        data,
+        isLoading: isPlaylistsLoading,
+        isSuccess: isPlaylistsSuccess,
+        refetch,
+    } = useGetUserPlaylistsQuery(userId);
+
+    const userPlaylists = data?.data || [];
+
+    const [
+        createPlaylist,
+        { isLoading: isCreateLoading, isSuccess: isCreateSuccess },
+    ] = useCreatePlaylistMutation();
+
+    const [addVideoToPlaylist] = useAddVideoToPlaylistMutation();
+
+    const [removeVideoFromPlaylist] = useRemoveVideoFromPlaylistMutation();
 
     useEffect(() => {
-        if (isOpen) {
-            const storedPlaylists = localStorage.getItem("playlists");
-            const parsedPlaylists = storedPlaylists
-                ? JSON.parse(storedPlaylists)
-                : [];
-            setPlaylists(parsedPlaylists);
-
-            // Initialize selected playlists based on current video's presence
+        if (isOpen && isPlaylistsSuccess) {
             const initialSelected = {};
-            parsedPlaylists.forEach((p) => {
-                initialSelected[p.id] = p.videoIds.includes(video.id);
+            userPlaylists.forEach((p) => {
+                initialSelected[p._id] = p.videos.includes(video._id);
             });
+
+            setInitialSelectedPlaylists(initialSelected);
             setSelectedPlaylists(initialSelected);
             setNewPlaylistName("");
             setShowNewPlaylistInput(false);
         }
-    }, [isOpen, video]);
+    }, [isOpen, video, isPlaylistsSuccess, userPlaylists]);
 
     const handleCheckboxChange = (playlistId, checked) => {
         setSelectedPlaylists((prev) => ({ ...prev, [playlistId]: checked }));
     };
 
-    const handleSave = () => {
-        const updatedPlaylists = playlists.map((p) => {
-            const isSelected = selectedPlaylists[p.id];
-            const videoAlreadyInPlaylist = p.videoIds.includes(video.id);
+    const handleSave = async () => {
+        const addedPlaylists = [];
+        const removedPlaylists = [];
 
-            if (isSelected && !videoAlreadyInPlaylist) {
-                return { ...p, videoIds: [...p.videoIds, video.id] };
-            } else if (!isSelected && videoAlreadyInPlaylist) {
-                return {
-                    ...p,
-                    videoIds: p.videoIds.filter((id) => id !== video.id),
-                };
+        Object.entries(selectedPlaylists).forEach(([playlistId, isChecked]) => {
+            const wasInitiallyChecked =
+                initialSelectedPlaylists[playlistId] || false;
+
+            if (isChecked && !wasInitiallyChecked) {
+                addedPlaylists.push(playlistId); // newly selected
+            } else if (!isChecked && wasInitiallyChecked) {
+                removedPlaylists.push(playlistId); // deselected
             }
-            return p;
         });
 
-        let finalPlaylists = updatedPlaylists;
-
+        // Create new playlist if requested
         if (showNewPlaylistInput && newPlaylistName.trim()) {
-            const newPlaylist = {
-                id: `playlist-${Date.now()}`, // Simple unique ID
+            await createPlaylist({
                 name: newPlaylistName.trim(),
-                videoIds: [video.id],
-            };
-            finalPlaylists = [...updatedPlaylists, newPlaylist];
+                description: "New Playlist",
+                videos: [video._id],
+                userId,
+            });
         }
 
-        localStorage.setItem("playlists", JSON.stringify(finalPlaylists));
-        onSave(); // Callback to refresh parent state if needed
+        // Add Videos to checked playlists
+        if (addedPlaylists.length) {
+            await addVideoToPlaylist({
+                videoId: video._id,
+                playlistIds: addedPlaylists,
+            });
+        }
+
+        // Remove Video from unchecked playlists
+        if (removedPlaylists.length) {
+            await removeVideoFromPlaylist({
+                videoId: video._id,
+                playlistIds: removedPlaylists,
+            });
+        }
+
+        // Add to Watch Later if nothing is selected
+        if (
+            !addedPlaylists.length &&
+            !removedPlaylists.length &&
+            !showNewPlaylistInput
+        ) {
+            // Todo: Implement add to watch later
+        }
+
+        // Refetch latest playlists to reflect new state
+        refetch();
+        onSave?.(); // optional callback
         onOpenChange(false);
     };
 
@@ -84,26 +132,30 @@ export function AddToPlaylistDialog({ isOpen, onOpenChange, video, onSave }) {
                         one.
                     </DialogDescription>
                 </DialogHeader>
+
                 <div className="grid gap-4 py-4 max-h-[300px] overflow-y-auto">
-                    {playlists.length === 0 && !showNewPlaylistInput && (
+                    {userPlaylists?.length === 0 && !showNewPlaylistInput && (
                         <p className="text-muted-foreground text-sm">
                             No playlists found. Create one below!
                         </p>
                     )}
-                    {playlists.map((p) => (
-                        <div key={p.id} className="flex items-center space-x-2">
+                    {userPlaylists.map((p) => (
+                        <div
+                            key={p._id}
+                            className="flex items-center space-x-2"
+                        >
                             <Checkbox
-                                id={`playlist-${p.id}`}
-                                checked={selectedPlaylists[p.id]}
+                                id={`playlist-${p._id}`}
+                                checked={selectedPlaylists[p._id]}
                                 onCheckedChange={(checked) =>
-                                    handleCheckboxChange(p.id, checked)
+                                    handleCheckboxChange(p._id, checked)
                                 }
                             />
                             <Label
-                                htmlFor={`playlist-${p.id}`}
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                htmlFor={`playlist-${p._id}`}
+                                className="text-sm font-medium"
                             >
-                                {p.name} ({p.videoIds.length} videos)
+                                {p.name} ({p.videos.length} videos)
                             </Label>
                         </div>
                     ))}
@@ -133,6 +185,7 @@ export function AddToPlaylistDialog({ isOpen, onOpenChange, video, onSave }) {
                         </Button>
                     )}
                 </div>
+
                 <DialogFooter>
                     <Button
                         variant="outline"
@@ -140,7 +193,9 @@ export function AddToPlaylistDialog({ isOpen, onOpenChange, video, onSave }) {
                     >
                         Cancel
                     </Button>
-                    <Button onClick={handleSave}>Save</Button>
+                    <Button onClick={handleSave} disabled={isCreateLoading}>
+                        Save
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
