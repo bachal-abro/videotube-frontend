@@ -5,11 +5,14 @@ const videoSlice = createSlice({
     initialState: {
         currentVideo: {},
         videoFeed: [],
+        subscriptionFeed: [],
     },
     reducers: {
         setVideoFeed: (state, action) => {
-            // If user is provided, update it; otherwise, keep the existing user
             state.videoFeed = action.payload;
+        },
+        setSubscriptionFeed: (state, action) => {
+            state.subscriptionFeed = action.payload;
         },
         setCurrentVideo: (state, action) => {
             state.currentVideo = action.payload;
@@ -17,6 +20,6 @@ const videoSlice = createSlice({
     },
 });
 
-export const { setVideoFeed, setCurrentVideo } =
+export const { setVideoFeed, setCurrentVideo, setSubscriptionFeed } =
     videoSlice.actions;
 export default videoSlice.reducer;

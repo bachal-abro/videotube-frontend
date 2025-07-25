@@ -23,7 +23,6 @@ const Home = () => {
     if (isLoading) {
         return <p>"Loading..."</p>;
     } else if (isSuccess) {
-        console.log(videoFeed);
         return (
             <div className="container mx-auto py-10 px-4 lg:px-6">
                 <div className="mb-8 flex overflow-x-auto pb-4 scrollbar-hide max">

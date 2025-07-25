@@ -1,17 +1,18 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { VideoCard } from "../components/video-card";
-import { setVideoFeed } from "../features/videos/videoSlice";
-import { useGetAllVideosQuery } from "../features/videos/videosApiSlice";
-import { videosData } from "../data/videos";
+import { setSubscriptionFeed } from "../features/videos/videoSlice";
+import { useGetVideosFromSubscriptionsQuery } from "../features/videos/videosApiSlice";
+import { timeAgo } from "../utils/timeAgo";
 
 const Subscriptions = () => {
+    const { subscriptionFeed } = useSelector((store) => store.video);
     const dispatch = useDispatch();
     const { data, isLoading, isSuccess, isError, error } =
-        useGetAllVideosQuery();
+        useGetVideosFromSubscriptionsQuery();
     useEffect(() => {
         if (isSuccess && data?.data) {
-            dispatch(setVideoFeed(data.data));
+            dispatch(setSubscriptionFeed(data.data));
         }
     }, [isSuccess, data, dispatch]);
 
@@ -22,18 +23,18 @@ const Subscriptions = () => {
             <div className="container mx-auto py-6 px-4 lg:px-6">
                 <h1 className="text-2xl font-bold mb-6">Latest</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {videosData.map((video) => (
+                    {subscriptionFeed.map((video) => (
                         <VideoCard
-                            key={video.id}
-                            id={video.id}
+                            key={video._id}
+                            id={video._id}
                             thumbnail={video.thumbnail}
                             title={video.title}
-                            channelName={video.channelName}
-                            channelAvatar={video.channelAvatar}
+                            channelName={video.ownerName}
+                            channelAvatar={video.ownerAvatar}
                             views={video.views}
-                            timestamp={video.timestamp}
+                            timestamp={timeAgo(video.createdAt)}
                             duration={video.duration}
-                            videoPreview={video.videoPreview}
+                            videoPreview={video.videoFile}
                         />
                     ))}
                 </div>

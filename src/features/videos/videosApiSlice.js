@@ -5,6 +5,9 @@ export const videosApiSlice = apiSlice.injectEndpoints({
         getAllVideos: builder.query({
             query: () => "/videos",
         }),
+        getVideosFromSubscriptions: builder.query({
+            query: () => "/videos/subscriptions",
+        }),
         getVideoById: builder.query({
             query: (videoId) => `/videos/${videoId}`,
         }),
@@ -26,6 +29,7 @@ export const videosApiSlice = apiSlice.injectEndpoints({
 
 export const {
     useGetAllVideosQuery,
+    useGetVideosFromSubscriptionsQuery,
     useGetVideoByIdQuery,
     useCreateVideoMutation,
     useDeleteVideoMutation,
