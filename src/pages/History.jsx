@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
 import { HistoryVideoCard } from "../components/HistoryVideoCard";
-import { videosData } from "../data/videos";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import {
@@ -11,43 +10,61 @@ import {
     Trash2,
     Settings,
 } from "lucide-react"; // Added icons
+import { useDispatch, useSelector } from "react-redux";
+import {
+    useClearHistoryMutation,
+    useGetUserHistoryQuery,
+    useRemoveVideoFromHistoryMutation,
+} from "../features/users/usersApiSlice";
+import { setHistory } from "../features/users/userSlice";
+import { timeAgo } from "../utils/timeAgo";
 
 export default function HistoryPage() {
     const [historyVideos, setHistoryVideos] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [isHistoryPaused, setIsHistoryPaused] = useState(false);
 
+    const { history } = useSelector((store) => store.user);
+    const dispatch = useDispatch();
+    const [
+        removeVideoFromHistory,
+        { isSuccess: isRemoved, isLoading: isRemoveLoading },
+    ] = useRemoveVideoFromHistoryMutation();
+    const { data, isLoading, isSuccess, isError, error, refetch } =
+        useGetUserHistoryQuery();
+    const [clearHistory] = useClearHistoryMutation();
+
     useEffect(() => {
-        // In a real application, you would fetch user's watch history here.
-        // For now, we'll simulate it by reversing the existing video data.
-        // Using a deep copy to ensure state updates trigger re-renders correctly.
-        setHistoryVideos(JSON.parse(JSON.stringify(videosData)).reverse());
-    }, []);
+        if (isSuccess && data?.data) {
+            dispatch(setHistory(data.data));
+        }
+    }, [isSuccess, data, dispatch, history]);
 
     const filteredVideos = useMemo(() => {
         if (!searchQuery) {
-            return historyVideos;
+            return history;
         }
         const lowerCaseQuery = searchQuery.toLowerCase();
-        return historyVideos.filter(
+        return history.filter(
             (video) =>
                 video.title.toLowerCase().includes(lowerCaseQuery) ||
-                video.channelName.toLowerCase().includes(lowerCaseQuery)
+                video?.owner?.fullName.toLowerCase().includes(lowerCaseQuery)
         );
-    }, [historyVideos, searchQuery]);
+    }, [history, searchQuery]);
 
-    const handleClearHistory = () => {
+    const handleClearHistory = async () => {
         if (
             window.confirm("Are you sure you want to clear all watch history?")
         ) {
-            setHistoryVideos([]);
+            await clearHistory();
+            refetch();
         }
     };
 
-    const handleRemoveVideo = (idToRemove) => {
-        setHistoryVideos((prevVideos) =>
-            prevVideos.filter((video) => video.id !== idToRemove)
-        );
+    const handleRemoveVideo = async (videoId) => {
+        await removeVideoFromHistory({ videoId });
+        // Refetch latest playlists to reflect new state
+        refetch();
     };
 
     return (
@@ -66,13 +83,13 @@ export default function HistoryPage() {
                     ) : (
                         filteredVideos.map((video) => (
                             <HistoryVideoCard
-                                key={video.id}
-                                id={video.id}
+                                key={video._id}
+                                id={video._id}
                                 thumbnail={video.thumbnail}
                                 title={video.title}
-                                channelName={video.channelName}
+                                channelName={video?.owner?.fullName}
                                 views={video.views}
-                                timestamp={video.timestamp}
+                                timestamp={timeAgo(video.createdAt)}
                                 onRemove={handleRemoveVideo}
                             />
                         ))
@@ -142,13 +159,13 @@ export default function HistoryPage() {
                                 ? "Resume watch history"
                                 : "Pause watch history"}
                         </Button>
-                        <Button
+                        {/* <Button
                             variant="ghost"
                             className="w-full justify-start"
                         >
                             <Settings className="mr-2 h-4 w-4" /> Manage all
                             history
-                        </Button>
+                        </Button> */}
                     </div>
 
                     <hr className="border-border" />
@@ -162,7 +179,7 @@ export default function HistoryPage() {
                         >
                             Watch history
                         </Button>
-                        <Button
+                        {/* <Button
                             variant="ghost"
                             className="w-full justify-start text-muted-foreground"
                         >
@@ -179,7 +196,7 @@ export default function HistoryPage() {
                             className="w-full justify-start text-muted-foreground"
                         >
                             Live chat history
-                        </Button>
+                        </Button> */}
                     </div>
                 </div>
             </div>

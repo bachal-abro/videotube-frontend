@@ -17,7 +17,7 @@ export function HistoryVideoCard({
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate(`/video/${id}`);
+        navigate(`/videos/${id}`);
     };
 
     const handleRemoveClick = (e) => {
