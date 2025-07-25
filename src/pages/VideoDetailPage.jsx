@@ -43,8 +43,6 @@ export default function VideoDetailPage() {
     const { videoId } = useParams();
     const [relatedVideos, setRelatedVideos] = useState([]);
     const [isSavedToWatchLater, setIsSavedToWatchLater] = useState(false);
-    const [isLiked, setIsLiked] = useState(false);
-    const [isDisliked, setIsDisliked] = useState(false); // New state for disliked status
     const [isAddToPlaylistDialogOpen, setIsAddToPlaylistDialogOpen] =
         useState(false);
     const [showFullDescription, setShowFullDescription] = useState(false); // State for description expansion
@@ -233,7 +231,7 @@ export default function VideoDetailPage() {
     const handlePlaylistSave = () => {
         toast({
             title: "Playlist updated",
-            description: "Video added/removed from selected playlists.",
+            description: "Selected playlists has been updated.",
         });
     };
 
@@ -312,100 +310,132 @@ export default function VideoDetailPage() {
                                         {video.owner.subscribers} subscribers
                                     </p>
                                 </div>
-                                <Button
-                                    variant={
-                                        video.owner.isSubscribed
-                                            ? "secondary"
-                                            : "outline"
-                                    }
-                                    size="sm"
-                                    className="ml-2 bg-transparent"
-                                    onClick={(e) => handleToggleSubscribe(e)}
-                                >
-                                    {video.owner.isSubscribed ? (
+                                                           {/* Subscribe Button Section - Updated */}
+                            <Button
+                                variant={
+                                    video.owner.isSubscribed
+                                        ? "secondary"
+                                        : "youtube-subscribe"
+                                }
+                                size="sm"
+                                className={cn(
+                                    "ml-2 transition-all duration-200",
+                                    video.owner.isSubscribed &&
+                                        "bg-gray-200 hover:bg-gray-300 text-gray-700 border"
+                                )}
+                                onClick={handleToggleSubscribe}
+                            >
+                                {video.owner.isSubscribed ? (
+                                    <>
                                         <Check className="mr-2 h-4 w-4" />
-                                    ) : (
+                                        Subscribed
+                                    </>
+                                ) : (
+                                    <>
                                         <Bell className="mr-2 h-4 w-4" />
-                                    )}{" "}
-                                    {video.owner.isSubscribed
-                                        ? "Subscribed"
-                                        : "Subscribe"}
-                                </Button>
+                                        Subscribe
+                                    </>
+                                )}
+                            </Button>
                             </div>
 
                             <div className="flex flex-wrap gap-2">
+                                {/* Like Button */}
                                 <Button
-                                    variant="secondary"
+                                    variant={
+                                        video.isLiked
+                                            ? "default"
+                                            : "secondary-enhanced"
+                                    }
                                     size="sm"
                                     className={cn(
-                                        "bg-secondary/80 hover:bg-secondary",
+                                        "transition-all duration-200",
                                         video.isLiked &&
-                                            "bg-primary text-primary-foreground hover:bg-primary/90"
+                                            "bg-green-600 hover:bg-green-700 text-white"
                                     )}
                                     onClick={(e) => handleToggleLike(e)}
-                                    type="submit"
+                                    type="button"
                                 >
-                                    <ThumbsUp className="mr-2 h-4 w-4" />{" "}
+                                    <ThumbsUp className="mr-2 h-4 w-4" />
                                     {video?.likes?.toLocaleString()}
                                 </Button>
+
+                                {/* Dislike Button */}
                                 <Button
-                                    variant="secondary"
+                                    variant={
+                                        video.isDisliked
+                                            ? "default"
+                                            : "secondary-enhanced"
+                                    }
                                     size="sm"
                                     className={cn(
-                                        "bg-secondary/80 hover:bg-secondary",
+                                        "transition-all duration-200",
                                         video.isDisliked &&
-                                            "bg-primary text-primary-foreground hover:bg-primary/90"
+                                            "bg-red-600 hover:bg-red-700 text-white"
                                     )}
                                     onClick={(e) => handleToggleDislike(e)}
-                                    type="submit"
+                                    type="button"
                                 >
-                                    <ThumbsDown className="mr-2 h-4 w-4" />{" "}
+                                    <ThumbsDown className="mr-2 h-4 w-4" />
                                     {video?.dislikes?.toLocaleString()}
                                 </Button>
+
+                                {/* Share Button */}
                                 <Button
-                                    variant="secondary"
+                                    variant="secondary-enhanced"
                                     size="sm"
-                                    className="bg-secondary/80 hover:bg-secondary"
+                                    className="hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-600 dark:hover:text-blue-400"
                                     onClick={handleShare}
                                 >
-                                    <Share2 className="mr-2 h-4 w-4" /> Share
+                                    <Share2 className="mr-2 h-4 w-4" />
+                                    Share
                                 </Button>
+
+                                {/* Download Button */}
                                 <Button
-                                    variant="secondary"
+                                    variant="secondary-enhanced"
                                     size="sm"
-                                    className="bg-secondary/80 hover:bg-secondary"
+                                    className="hover:bg-purple-50 dark:hover:bg-purple-950 hover:text-purple-600 dark:hover:text-purple-400"
                                     onClick={handleDownload}
                                 >
-                                    <Download className="mr-2 h-4 w-4" />{" "}
+                                    <Download className="mr-2 h-4 w-4" />
                                     Download
                                 </Button>
+
+                                {/* Save Button */}
                                 <Button
-                                    variant="secondary"
+                                    variant="secondary-enhanced"
                                     size="sm"
-                                    className="bg-secondary/80 hover:bg-secondary"
+                                    className="hover:bg-yellow-50 dark:hover:bg-yellow-950 hover:text-yellow-600 dark:hover:text-yellow-400"
                                     onClick={() =>
                                         setIsAddToPlaylistDialogOpen(true)
                                     }
                                 >
-                                    <Plus className="mr-2 h-4 w-4" /> Save
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    Save
                                 </Button>
+
+                                {/* More Options Dropdown */}
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button
-                                            variant="secondary"
+                                            variant="secondary-enhanced"
                                             size="sm"
-                                            className="bg-secondary/80 hover:bg-secondary"
+                                            className="hover:bg-gray-50 dark:hover:bg-gray-800"
                                         >
                                             <MoreHorizontal className="h-4 w-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem>
-                                            <Flag className="mr-2 h-4 w-4" />{" "}
+                                    <DropdownMenuContent
+                                        align="end"
+                                        className="bg-popover border border-border"
+                                    >
+                                        <DropdownMenuItem className="hover:bg-accent hover:text-accent-foreground">
+                                            <Flag className="mr-2 h-4 w-4" />
                                             Report
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            <FileText className="mr-2 h-4 w-4" />{" "}
+                                        <DropdownMenuItem className="hover:bg-accent hover:text-accent-foreground">
+                                            <FileText className="mr-2 h-4 w-4" />
                                             Show Transcript
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
