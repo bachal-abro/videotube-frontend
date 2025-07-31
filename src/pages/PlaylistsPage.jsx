@@ -1,69 +1,51 @@
 import { useState, useEffect, useMemo } from "react";
 import { PlaylistCard } from "../components/PlaylistCard";
 import { CreatePlaylistDialog } from "../components/CreatePlaylistDialog";
-import { videosData } from "../data/videos"; // To get video details for thumbnails
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Search, Plus, X } from "lucide-react";
+import {
+    useDeletePlaylistMutation,
+    useGetUserPlaylistsQuery,
+    useCreatePlaylistMutation,
+} from "../features/playlist/playlistsApiSlice";
+import { useSelector } from "react-redux";
 
 export default function PlaylistsPage() {
     const [playlists, setPlaylists] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-
+    const user = useSelector((store) => store.auth.user);
+    const { data, isLoading, isSuccess, refetch } = useGetUserPlaylistsQuery(
+        user._id
+    );
+    const [createPlaylist] = useCreatePlaylistMutation();
+    const [deletePlaylist] = useDeletePlaylistMutation();
     useEffect(() => {
-        loadPlaylists();
-    }, []);
+        if (data && isSuccess) {
+            loadPlaylists();
+        }
+        refetch();
+    }, [isLoading, isSuccess, refetch, data?.data]);
 
     const loadPlaylists = () => {
-        const storedPlaylists = localStorage.getItem("playlists");
+        const storedPlaylists = data?.data;
+
         if (storedPlaylists) {
-            const parsedPlaylists = JSON.parse(storedPlaylists);
-            // Hydrate playlists with actual video objects for thumbnails/details
-            const hydratedPlaylists = parsedPlaylists.map((p) => ({
-                ...p,
-                videos: p.videoIds
-                    .map((videoId) => videosData.find((v) => v.id === videoId))
-                    .filter(Boolean),
-            }));
-            setPlaylists(hydratedPlaylists);
+            setPlaylists(storedPlaylists);
         }
     };
 
-    const handleCreatePlaylist = (name) => {
-        const newPlaylist = {
-            id: `playlist-${Date.now()}`, // Simple unique ID
+    const handleCreatePlaylist = async (name) => {
+        await createPlaylist({
             name,
-            videoIds: [],
-            videos: [], // Initialize with empty array for hydrated data
-        };
-        const updatedPlaylists = [...playlists, newPlaylist];
-        setPlaylists(updatedPlaylists);
-        localStorage.setItem(
-            "playlists",
-            JSON.stringify(
-                updatedPlaylists.map((p) => ({
-                    id: p.id,
-                    name: p.name,
-                    videoIds: p.videoIds,
-                }))
-            )
-        );
+            description: "",
+        });
     };
 
-    const handleDeletePlaylist = (idToDelete) => {
-        const updatedPlaylists = playlists.filter((p) => p.id !== idToDelete);
-        setPlaylists(updatedPlaylists);
-        localStorage.setItem(
-            "playlists",
-            JSON.stringify(
-                updatedPlaylists.map((p) => ({
-                    id: p.id,
-                    name: p.name,
-                    videoIds: p.videoIds,
-                }))
-            )
-        );
+    const handleDeletePlaylist = async (playlistId) => {
+        await deletePlaylist(playlistId);
+        refetch();
     };
 
     const filteredPlaylists = useMemo(() => {
@@ -93,7 +75,7 @@ export default function PlaylistsPage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                             {filteredPlaylists.map((playlist) => (
                                 <PlaylistCard
-                                    key={playlist.id}
+                                    key={playlist._id}
                                     playlist={playlist}
                                     onDelete={handleDeletePlaylist}
                                 />

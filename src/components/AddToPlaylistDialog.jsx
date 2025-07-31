@@ -96,6 +96,7 @@ export function AddToPlaylistDialog({ isOpen, onOpenChange, video, onSave }) {
             await addVideoToPlaylist({
                 videoId: video._id,
                 playlistIds: addedPlaylists,
+                thumbnail: video.thumbnail,
             });
         }
 

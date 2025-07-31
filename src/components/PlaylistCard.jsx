@@ -10,22 +10,18 @@ import {
 
 export function PlaylistCard({ playlist, onDelete }) {
     const navigate = useNavigate();
-    const firstVideoThumbnail =
-        playlist.videos.length > 0 ? playlist.videos[0].thumbnail : null;
 
     const handleCardClick = () => {
         // Navigate to a playlist detail page (you can implement this later)
-        navigate(`/playlist/${playlist.id}`);
+        navigate(`/playlist/${playlist._id}`);
     };
-
     const handleDeleteClick = (e) => {
-        e.stopPropagation(); // Prevent card click
         if (
             window.confirm(
                 `Are you sure you want to delete the playlist "${playlist.name}"?`
             )
         ) {
-            onDelete(playlist.id);
+            onDelete(playlist._id);
         }
     };
 
@@ -35,9 +31,13 @@ export function PlaylistCard({ playlist, onDelete }) {
                 className="relative aspect-video w-full"
                 onClick={handleCardClick}
             >
-                {firstVideoThumbnail ? (
+                {playlist.thumbnail ? (
                     <img
-                        src={firstVideoThumbnail || "/placeholder.svg"}
+                        src={
+                            playlist.videos.length
+                                ? playlist.thumbnail
+                                : "/playlist_placeholder.jpg"
+                        }
                         alt={playlist.name}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
