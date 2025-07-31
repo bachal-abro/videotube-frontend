@@ -4,29 +4,25 @@ import { videosData } from "../data/videos";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Search, X, Trash2 } from "lucide-react";
+import {
+    useClearLikedVideosMutation,
+    useGetLikedVideosQuery,
+    useToggleVideoLikeMutation,
+} from "../features/likes/likesApiSlice";
+import { timeAgo } from "../utils/timeAgo";
 
 export default function LikedVideosPage() {
     const [likedVideos, setLikedVideos] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
-
+    const { data, isSuccess, isLoading, refetch } = useGetLikedVideosQuery();
+    const [toggleVideoLike] = useToggleVideoLikeMutation();
+    const [clearLikedVideos] = useClearLikedVideosMutation();
     useEffect(() => {
-        // Load liked videos from localStorage on mount
-        const storedVideos = localStorage.getItem("likedVideos");
-        if (storedVideos) {
-            const videoIds = JSON.parse(storedVideos);
-            // Filter videosData to get the actual video objects
-            const videos = videosData.filter((video) =>
-                videoIds.includes(video.id)
-            );
-            setLikedVideos(videos);
+        if (isSuccess) {
+            setLikedVideos(data.data);
         }
-    }, []);
-
-    // Save liked videos to localStorage whenever the state changes
-    useEffect(() => {
-        const videoIds = likedVideos.map((video) => video.id);
-        localStorage.setItem("likedVideos", JSON.stringify(videoIds));
-    }, [likedVideos]);
+        refetch();
+    }, [isSuccess, isLoading, data, refetch]);
 
     const filteredVideos = useMemo(() => {
         if (!searchQuery) {
@@ -36,22 +32,22 @@ export default function LikedVideosPage() {
         return likedVideos.filter(
             (video) =>
                 video.title.toLowerCase().includes(lowerCaseQuery) ||
-                video.channelName.toLowerCase().includes(lowerCaseQuery)
+                video.owner.fullName.toLowerCase().includes(lowerCaseQuery)
         );
     }, [likedVideos, searchQuery]);
 
-    const handleClearLikedVideos = () => {
+    const handleClearLikedVideos = async () => {
         if (
             window.confirm("Are you sure you want to clear all liked videos?")
         ) {
-            setLikedVideos([]);
+            await clearLikedVideos();
+            refetch();
         }
     };
 
-    const handleRemoveVideo = (idToRemove) => {
-        setLikedVideos((prevVideos) =>
-            prevVideos.filter((video) => video.id !== idToRemove)
-        );
+    const handleRemoveVideo = async (idToRemove) => {
+        await toggleVideoLike(idToRemove);
+        refetch();
     };
 
     return (
@@ -70,13 +66,13 @@ export default function LikedVideosPage() {
                     ) : (
                         filteredVideos.map((video) => (
                             <LikedVideoCard
-                                key={video.id}
-                                id={video.id}
+                                key={video._id}
+                                id={video._id}
                                 thumbnail={video.thumbnail}
                                 title={video.title}
-                                channelName={video.channelName}
+                                channelName={video.owner.fullName}
                                 views={video.views}
-                                timestamp={video.timestamp}
+                                timestamp={timeAgo(video.createdAt)}
                                 onRemove={handleRemoveVideo}
                             />
                         ))

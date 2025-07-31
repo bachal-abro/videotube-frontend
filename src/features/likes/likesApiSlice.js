@@ -14,9 +14,21 @@ export const likesApiSlice = apiSlice.injectEndpoints({
                 method: "POST",
             }),
         }),
-        
+        clearLikedVideos: builder.mutation({
+            query: () => ({
+                url: `likes/videos/delete`,
+                method: "delete",
+            }),
+        }),
+        getLikedVideos: builder.query({
+            query: () => "likes/videos",
+        }),
     }),
 });
 
-export const { useToggleVideoLikeMutation, useToggleCommentLikeMutation } =
-    likesApiSlice;
+export const {
+    useToggleVideoLikeMutation,
+    useToggleCommentLikeMutation,
+    useGetLikedVideosQuery,
+    useClearLikedVideosMutation,
+} = likesApiSlice;

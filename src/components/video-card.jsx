@@ -41,7 +41,7 @@ export function VideoCard({
 
   // Navigate to video detail page
   const handleClick = () => {
-    navigate(`/videos/${id}`)
+    navigate(`/video/${id}`)
   }
 
   // Control video playback based on hover state
