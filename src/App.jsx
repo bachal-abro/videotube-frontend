@@ -10,6 +10,8 @@ import {
     Settings,
     PlaylistsPage,
     PlaylistDetailPage,
+    UploadPage,
+    YourVideosPage,
 } from "./pages/index";
 
 import Layout from "./layout/Layout";
@@ -50,10 +52,17 @@ function App() {
                         />
                         <Route path="liked" element={<LikedVideos />} />
                         <Route path="playlists" element={<PlaylistsPage />} />
-                        <Route path="playlist/:id" element={<PlaylistDetailPage />} />
+                        <Route
+                            path="playlist/:id"
+                            element={<PlaylistDetailPage />}
+                        />
                         <Route path="settings" element={<Settings />} />
                         <Route path="logout" element={<Login />} />
-
+                        <Route path="upload" element={<UploadPage />} />
+                        <Route
+                            path="your-videos"
+                            element={<YourVideosPage />}
+                        />
                         {/* Videos */}
                         <Route
                             path="video/:videoId"

@@ -1,23 +1,21 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { Sidebar } from "../components/Sidebar";
 import { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { ThemeToggle } from "../components/theme-toggle";
-import { Input } from "../components/ui/Input"; // Import Input component
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"; // Import Avatar components
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "../components/ui/popover";
-import { Menu, Search, X, Bell, User, Settings, LogOut } from "lucide-react";
 import Header from "./Header";
 import { useSelector } from "react-redux";
 
 export default function Layout() {
     const { sidebarOpen } = useSelector((store) => store.system);
     const [searchQuery, setSearchQuery] = useState("");
-
+    const navigate = useNavigate()
     const handleSearch = (e) => {
         e.preventDefault();
         console.log("Searching for:", searchQuery);

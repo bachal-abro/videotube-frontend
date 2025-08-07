@@ -9,7 +9,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "../components/ui/popover";
-import { Menu, Search, X, Bell, User, Settings, LogOut } from "lucide-react";
+import { Menu, Search, X, Bell, User, Settings, LogOut, Plus } from 'lucide-react' 
 import { useNavigate } from "react-router-dom";
 import { setSidebarOpen } from "../features/system/systemSlice";
 

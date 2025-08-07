@@ -15,6 +15,7 @@ const Home = () => {
     const { data, isLoading, isSuccess, isError, error } =
         useGetAllVideosQuery();
     useEffect(() => {
+        console.log(data?.data);
         if (isSuccess && data?.data) {
             dispatch(setVideoFeed(data.data));
         }

@@ -2,8 +2,17 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
     Home,
+    TrendingUp,
+    Music,
+    Film,
+    Gamepad2,
+    Newspaper,
+    Trophy,
+    Lightbulb,
+    Shirt,
     History,
     Clock,
+    Tv,
     ThumbsUp,
     PlaySquare,
     Settings,
@@ -11,7 +20,6 @@ import {
     Flag,
     ChevronDown,
     ChevronRight,
-    Tv,
     ListVideo,
 } from "lucide-react";
 import { cn } from "../lib/utils";
@@ -26,8 +34,8 @@ const navigationItems = [
     { icon: Clock, label: "Watch Later", path: "/watch-later" },
     { icon: ThumbsUp, label: "Liked Videos", path: "/liked" },
     { icon: ListVideo, label: "Playlists", path: "/playlists" },
+    { icon: PlaySquare, label: "Your Videos", path: "/your-videos" },
 ];
-
 
 const subscriptions = [
     {
@@ -145,7 +153,7 @@ export function Sidebar() {
             />
 
             {/* Sidebar */}
-            <aside className="fixed bg-black bg-background left-0 top-16 h-[calc(100vh-4rem)] w-64 lg:bg-[#020817] border-r z-40 overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+            <aside className="fixed bg-background left-0 top-16 h-[calc(100vh-4rem)] w-64 border-r z-40 overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
                 <div className="p-4 space-y-6 bg-background">
                     {/* Main Navigation */}
                     <div className="space-y-1">

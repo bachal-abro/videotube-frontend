@@ -9,6 +9,8 @@ import VideoView from "./VideoView.jsx";
 import WatchLaterPage from "./WatchLaterPage.jsx";
 import PlaylistsPage from "./PlaylistsPage";
 import PlaylistDetailPage from "./PlaylistDetailPage.jsx";
+import UploadPage from "./UploadPage.jsx";
+import YourVideosPage from "./YourVideosPage.jsx";
 
 export {
     Home,
@@ -22,4 +24,6 @@ export {
     WatchLaterPage,
     PlaylistsPage,
     PlaylistDetailPage,
+    UploadPage,
+    YourVideosPage,
 };

@@ -5,13 +5,16 @@ export const videosApiSlice = apiSlice.injectEndpoints({
         getAllVideos: builder.query({
             query: () => "/videos",
         }),
+        getAllVideosOfUser: builder.query({
+            query: () => "/videos/user/current",
+        }),
         getVideosFromSubscriptions: builder.query({
             query: () => "/videos/subscriptions",
         }),
         getVideoById: builder.query({
             query: (videoId) => `/videos/${videoId}`,
         }),
-        createVideo: builder.mutation({
+        uploadVideo: builder.mutation({
             query: (videoData) => ({
                 url: "/videos",
                 method: "POST",
@@ -19,9 +22,16 @@ export const videosApiSlice = apiSlice.injectEndpoints({
             }),
         }),
         deleteVideo: builder.mutation({
-            query: (videoId) => ({
+            query: ({ videoId }) => ({
                 url: `/videos/${videoId}`,
                 method: "DELETE",
+            }),
+        }),
+        toggleVisibilityStatus: builder.mutation({
+            query: ({ videoId, visibilityStatus }) => ({
+                url: `/videos/toggle/visibility/${videoId}/`,
+                method: "PATCH",
+                body: { visibilityStatus },
             }),
         }),
     }),
@@ -29,8 +39,10 @@ export const videosApiSlice = apiSlice.injectEndpoints({
 
 export const {
     useGetAllVideosQuery,
+    useGetAllVideosOfUserQuery,
     useGetVideosFromSubscriptionsQuery,
     useGetVideoByIdQuery,
-    useCreateVideoMutation,
+    useUploadVideoMutation,
     useDeleteVideoMutation,
+    useToggleVisibilityStatusMutation,
 } = videosApiSlice;
