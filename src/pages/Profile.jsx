@@ -257,6 +257,7 @@ export default function ChannelPage() {
 
         try {
             await updateAccountDetails(updatedValues).unwrap();
+            navigate(`/@${editDetailsState?.username || profile.username}`);
             setIsEditDetailsOpen(false);
             toast({
                 title: "Channel details updated",
