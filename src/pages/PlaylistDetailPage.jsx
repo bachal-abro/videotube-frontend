@@ -76,7 +76,7 @@ export default function PlaylistDetailPage() {
         return playlist.videos.filter(
             (video) =>
                 video.title.toLowerCase().includes(lowerCaseQuery) ||
-                video.owner.fullName.toLowerCase().includes(lowerCaseQuery)
+                video.owner.displayName.toLowerCase().includes(lowerCaseQuery)
         );
     }, [playlist, searchQuery]);
 

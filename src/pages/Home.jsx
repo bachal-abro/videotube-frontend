@@ -49,7 +49,7 @@ const Home = () => {
                             channelName={video.ownerName}
                             channelAvatar={video.ownerAvatar}
                             views={video.views}
-                            timestamp={timeAgo(video.createdAt)}
+                            timestamp={video.createdAt}
                             duration={video.duration}
                             videoPreview={video.videoFile}
                         />

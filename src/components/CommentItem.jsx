@@ -74,7 +74,7 @@ function CommentItem({ comment, hasParent }) {
                 owner: {
                     _id: user?._id,
                     username: user?.username,
-                    fullName: user?.fullName,
+                    displayName: user?.displayName,
                     avatar: user?.avatar,
                 },
                 createdAt: comment?.createdAt,
@@ -125,7 +125,7 @@ function CommentItem({ comment, hasParent }) {
                 owner: {
                     _id: user?._id,
                     username: user?.username,
-                    fullName: user?.fullName,
+                    displayName: user?.displayName,
                     avatar: user?.avatar,
                 },
                 createdAt: comment?.createdAt,
@@ -173,10 +173,10 @@ function CommentItem({ comment, hasParent }) {
             <Avatar className="h-8 w-8 flex-shrink-0">
                 <AvatarImage
                     src={comment?.owner?.avatar || "/placeholder.svg"}
-                    alt={comment?.owner?.fullName}
+                    alt={comment?.owner?.displayName}
                 />
                 <AvatarFallback>
-                    {comment?.owner?.fullName?.charAt(0)}
+                    {comment?.owner?.displayName?.charAt(0)}
                 </AvatarFallback>
             </Avatar>
 
@@ -184,7 +184,7 @@ function CommentItem({ comment, hasParent }) {
                 {/* Comment Header (User Name & Timestamp) */}
                 <div className="flex items-center gap-2">
                     <span className="font-medium text-sm">
-                        {comment?.owner?.fullName}
+                        {comment?.owner?.displayName}
                     </span>
                     <span className="text-xs text-muted-foreground">
                         {timeAgo(comment?.createdAt)}
@@ -229,7 +229,7 @@ function CommentItem({ comment, hasParent }) {
                         <Avatar className="h-8 w-8 flex-shrink-0">
                             <AvatarImage
                                 src={comment?.owner?.avatar}
-                                alt={comment?.owner?.fullName}
+                                alt={comment?.owner?.displayName}
                             />
                             <AvatarFallback>U</AvatarFallback>
                         </Avatar>

@@ -16,24 +16,47 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                 method: "PATCH",
             }),
         }),
+        updateAccountDetails: builder.mutation({
+            query: (formData) => ({
+                url: "/users/update-account",
+                method: "PATCH",
+                body: formData,
+            }),
+        }),
+        updateAvatar: builder.mutation({
+            query: (avatar) => ({
+                url: "/users/avatar",
+                method: "PATCH",
+                body: avatar,
+            }),
+        }),
+        updateBanner: builder.mutation({
+            query: (banner) => ({
+                url: "/users/banner",
+                method: "PATCH",
+                body: banner,
+            }),
+        }),
+        
         clearHistory: builder.mutation({
             query: () => ({
                 url: `/users/history/clear`,
                 method: "PATCH",
             }),
         }),
-
-        getUserById: builder.query({
-            query: (userId) => `users/${userId}`,
-            keepUnusedDataFor: 60,
+        getUserChannelProfile: builder.query({
+            query: (username) => `users/c/${username}`,
         }),
     }),
 });
 
 export const {
     useGetUsersQuery,
-    useGetUserByIdQuery,
+    useGetUserChannelProfileQuery,
     useGetUserHistoryQuery,
     useRemoveVideoFromHistoryMutation,
     useClearHistoryMutation,
+    useUpdateAccountDetailsMutation,
+    useUpdateBannerMutation,
+    useUpdateAvatarMutation,
 } = usersApiSlice;

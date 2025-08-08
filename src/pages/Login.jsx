@@ -7,7 +7,7 @@ import { useLoginMutation } from "../features/auth/authApiSlice";
 const Login = () => {
     const userRef = useRef();
     const errRef = useRef();
-    const [username, setUsername] = useState("");
+    const [username, sethandle] = useState("");
     const [password, setPassword] = useState("");
     const [errMsg, setErrMsg] = useState("");
     const navigate = useNavigate();
@@ -35,14 +35,14 @@ const Login = () => {
                     user: userData.data.user,
                 })
             );
-            setUsername("");
+            sethandle("");
             setPassword("");
             navigate("/");
         } catch (err) {
             if (!err?.originalStatus) {
                 setErrMsg("No Server Response");
             } else if (err.originalStatus === 400) {
-                setErrMsg("Missing Username or Password");
+                setErrMsg("Missing username or Password");
             } else if (err.originalStatus === 401) {
                 setErrMsg("Unauthorized");
             } else {
@@ -63,13 +63,13 @@ const Login = () => {
             </p>
             <h1>Employee Login</h1>
             <form onSubmit={handleSubmit}>
-                <label htmlFor="username">Username:</label>
+                <label htmlFor="username">username:</label>
                 <input
                     type="text"
                     id="username"
                     ref={userRef}
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={(e) => sethandle(e.target.value)}
                     autoComplete="off"
                     required
                 />

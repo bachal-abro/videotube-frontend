@@ -32,7 +32,7 @@ export default function LikedVideosPage() {
         return likedVideos.filter(
             (video) =>
                 video.title.toLowerCase().includes(lowerCaseQuery) ||
-                video.owner.fullName.toLowerCase().includes(lowerCaseQuery)
+                video.owner.displayName.toLowerCase().includes(lowerCaseQuery)
         );
     }, [likedVideos, searchQuery]);
 
@@ -70,7 +70,7 @@ export default function LikedVideosPage() {
                                 id={video._id}
                                 thumbnail={video.thumbnail}
                                 title={video.title}
-                                channelName={video.owner.fullName}
+                                channelName={video.owner.displayName}
                                 views={video.views}
                                 timestamp={timeAgo(video.createdAt)}
                                 onRemove={handleRemoveVideo}

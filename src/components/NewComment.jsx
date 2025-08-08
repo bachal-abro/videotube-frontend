@@ -33,7 +33,7 @@ const NewComment = () => {
                 owner: {
                     _id: user?._id,
                     username: user?.username,
-                    fullName: user?.fullName,
+                    displayName: user?.displayName,
                     avatar: user?.avatar,
                 },
                 createdAt: newComment?.data?.createdAt,

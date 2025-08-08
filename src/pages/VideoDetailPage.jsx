@@ -218,8 +218,8 @@ export default function VideoDetailPage() {
 
         toast({
             title: video?.owner?.isSubscribed
-                ? `Unsubscribed from ${video?.owner?.fullName}`
-                : `Subscribed to ${video?.owner?.fullName}`,
+                ? `Unsubscribed from ${video?.owner?.displayName}`
+                : `Subscribed to ${video?.owner?.displayName}`,
             description: video?.owner?.isSubscribed
                 ? "You will no longer receive notifications."
                 : "You will now receive notifications.",
@@ -296,15 +296,15 @@ export default function VideoDetailPage() {
                                             video.owner.avatar ||
                                             "https://placehold.co/40x40"
                                         }
-                                        alt={video.owner.fullName}
+                                        alt={video.owner.displayName}
                                     />
                                     <AvatarFallback>
-                                        {video.owner.fullName.charAt(0)}
+                                        {video.owner.displayName.charAt(0)}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div>
                                     <p className="font-medium">
-                                        {video.owner.fullName}
+                                        {video.owner.displayName}
                                     </p>
                                     <p className="text-sm text-muted-foreground">
                                         {video.owner.subscribers} subscribers

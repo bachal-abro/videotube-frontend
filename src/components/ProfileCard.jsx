@@ -12,7 +12,7 @@ const ProfileCard = () => {
                 alt="Avatar"
             />
             <div className="flex flex-col">
-                <h1 className="font-medium">{currentVideo.owner?.fullName}</h1>
+                <h1 className="font-medium">{currentVideo.owner?.displayName}</h1>
                 <p className="text-sm text-gray-300">
                     {currentVideo?.owner?.subscribers} Subscribers
                 </p>

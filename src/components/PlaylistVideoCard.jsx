@@ -103,7 +103,7 @@ export function PlaylistVideoCard({
                 </h3>
                 <div className="text-xs text-muted-foreground space-y-0.5">
                     <p className="font-medium">
-                        {video.owner.Fullname || video.owner.username}
+                        {video.owner.displayName || video.owner.username}
                     </p>
                     <p>
                         {video.views} views • {timeAgo(video.createdAt)}

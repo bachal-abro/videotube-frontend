@@ -137,7 +137,7 @@ const Header = () => {
                                 </Avatar>
                                 <div>
                                     <p className="font-medium">
-                                        {user?.fullName}
+                                        {user?.displayName}
                                     </p>
                                     <p className="text-sm text-muted-foreground">
                                         @{user?.username}

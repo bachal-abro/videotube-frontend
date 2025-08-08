@@ -48,7 +48,7 @@ export default function HistoryPage() {
         return history.filter(
             (video) =>
                 video.title.toLowerCase().includes(lowerCaseQuery) ||
-                video?.owner?.fullName.toLowerCase().includes(lowerCaseQuery)
+                video?.owner?.displayName.toLowerCase().includes(lowerCaseQuery)
         );
     }, [history, searchQuery]);
 
@@ -87,7 +87,7 @@ export default function HistoryPage() {
                                 id={video._id}
                                 thumbnail={video.thumbnail}
                                 title={video.title}
-                                channelName={video?.owner?.fullName}
+                                channelName={video?.owner?.displayName}
                                 views={video.views}
                                 timestamp={timeAgo(video.createdAt)}
                                 onRemove={handleRemoveVideo}
