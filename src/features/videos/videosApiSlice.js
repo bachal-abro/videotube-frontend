@@ -6,7 +6,7 @@ export const videosApiSlice = apiSlice.injectEndpoints({
             query: () => "/videos",
         }),
         getAllVideosOfUser: builder.query({
-            query: () => "/videos/user/current",
+            query: (userId) => `/videos/user/${userId}`,
         }),
         getVideosFromSubscriptions: builder.query({
             query: () => "/videos/subscriptions",

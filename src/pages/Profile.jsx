@@ -13,6 +13,8 @@ import {
     Video,
     Plus,
     X,
+    Bell,
+    Check,
 } from "lucide-react";
 
 import { Button } from "../components/ui/button";
@@ -40,13 +42,9 @@ import { Tabs } from "../components/ui/tabs";
 import { VideoCard } from "../components/video-card";
 import { PlaylistCard } from "../components/PlaylistCard";
 import { videosData as sampleVideos } from "../data/videos";
-import { cn } from "../lib/utils";
 import { useToast } from "../hooks/use-toast";
 import { useGetUserPlaylistsQuery } from "../features/playlist/playlistsApiSlice";
-import {
-    useGetAllVideosOfUserQuery,
-    useUploadVideoMutation,
-} from "../features/videos/videosApiSlice";
+import { useGetAllVideosOfUserQuery } from "../features/videos/videosApiSlice";
 import { useSelector } from "react-redux";
 import {
     useGetUserChannelProfileQuery,
@@ -54,21 +52,20 @@ import {
     useUpdateBannerMutation,
     useUpdateAvatarMutation,
 } from "../features/users/usersApiSlice";
+import { useToggleSubscriptionMutation } from "../features/subscription/subscriptionApiSlice";
 import { timeAgo } from "../utils/timeAgo";
-
 const TabsList = Tabs.List;
 const TabsTrigger = Tabs.Trigger;
 const TabsContent = Tabs.Content;
 
 const DEFAULT_PROFILE = {
-    displayName: "John Doe",
-    username: "@johndoe",
-    description:
-        "Welcome to my channel! I share tutorials, tips, and projects on web development and design.",
-    banner: "", // data URL or external
+    displayName: "User",
+    username: "@user",
+    description: "Welcome to my channel!",
+    coverImage: "",
     avatar: "",
     subscribersCount: 0,
-    createdAt: "2024-01-01",
+    createdAt: new Date().toISOString(),
 };
 
 function toDataURL(file) {
@@ -95,58 +92,138 @@ export default function ChannelPage() {
     const [tempAvatarUrl, setTempAvatarUrl] = useState("");
     const [tempAvatarFile, setTempAvatarFile] = useState(null);
     const [activeTab, setActiveTab] = useState("home");
+    const [isSubscribed, setIsSubscribed] = useState(false);
+    const [isSubscribing, setIsSubscribing] = useState(false);
     const bannerInputRef = useRef(null);
     const avatarInputRef = useRef(null);
     const navigate = useNavigate();
     const { toast } = useToast();
 
-    const user = useSelector((store) => store.auth.user);
+    const currentUser = useSelector((store) => store.auth.user);
+    const { username } = useParams();
+
+    // Determine if this is the current user's profile
+    const targetUsername = username?.startsWith("@")
+        ? username.slice(1)
+        : username;
+    const isOwnProfile = currentUser?.username === targetUsername;
 
     // Load channel profile from API
-    const { username } = useParams();
     const {
         data: userData,
         isLoading: isUserLoading,
         isSuccess: isUserSuccess,
-    } = useGetUserChannelProfileQuery(username.split("@")[1]);
+        error: userError,
+    } = useGetUserChannelProfileQuery(targetUsername, {
+        skip: !targetUsername,
+    });
+
+    // Check subscription status for other users
+    // const { data: subscriptionData, isLoading: isSubscriptionLoading } =
+    //     useCheckSubscriptionStatusQuery(profile._id, {
+    //         skip: isOwnProfile || !profile._id,
+    //     });
 
     useEffect(() => {
-        if (isUserSuccess) {
+        if (isUserSuccess && userData?.data) {
             setProfile(userData.data);
+            setIsSubscribed(userData.data.isSubscribed);
         }
-    }, [isUserLoading, isUserSuccess]);
+    }, [isUserSuccess, userData, profile, isSubscribed]);
 
-    // Load uploaded videos
-    const [featuredVideo, setFeaturedVideo] = useState({});
+    // useEffect(() => {
+    //     if (subscriptionData?.data) {
+    //         setIsSubscribed(subscriptionData.data.isSubscribed);
+    //     }
+    // }, [subscriptionData]);
+
+    // Load videos - use different queries based on profile ownership
+    const [featuredVideo, setFeaturedVideo] = useState(null);
     const {
-        data: videosData,
-        isSuccess: videosSuccess,
-        isLoading: videosLoading,
-        refetch: videosRefetch,
-    } = useGetAllVideosOfUserQuery();
+        data: ownVideosData,
+        isSuccess: ownVideosSuccess,
+        isLoading: ownVideosLoading,
+    } = useGetAllVideosOfUserQuery(currentUser?._id, {
+        skip: !isOwnProfile,
+    });
+
+    const {
+        data: userVideosData,
+        isSuccess: userVideosSuccess,
+        isLoading: userVideosLoading,
+    } = useGetAllVideosOfUserQuery(profile._id, {
+        skip: isOwnProfile || !profile._id,
+    });
 
     const uploadedVideos = useMemo(() => {
+        const videosData = isOwnProfile ? ownVideosData : userVideosData;
         if (videosData?.data) {
-            const stored = videosData.data;
-            setFeaturedVideo(videosData.data[0]);
-            return stored ? videosData?.data : [];
-        }
-    }, [videosData, videosLoading, videosSuccess]);
-
-    // Load playlists
-    const { data, isLoading, isSuccess, refetch } = useGetUserPlaylistsQuery(
-        user?._id
-    );
-    const playlists = useMemo(() => {
-        if (data?.data) {
-            const stored = data.data;
-            return stored;
+            const videos = videosData.data;
+            setFeaturedVideo(videos[0] || null);
+            return videos;
         }
         return [];
-    }, [uploadedVideos, isLoading, isSuccess, data?.data]);
+    }, [
+        isOwnProfile,
+        ownVideosData,
+        userVideosData,
+        ownVideosSuccess,
+        userVideosSuccess,
+    ]);
 
-    // Edit functions
+    // Load playlists
+    const {
+        data: playlistsData,
+        isLoading: playlistsLoading,
+        isSuccess: playlistsSuccess,
+    } = useGetUserPlaylistsQuery(profile._id, { skip: !profile._id });
+
+    const playlists = useMemo(() => {
+        if (playlistsData?.data) {
+            return playlistsData.data;
+        }
+        return [];
+    }, [playlistsData, playlistsSuccess]);
+
+    // Subscription mutations
+    // const [subscribeToChannel] = useSubscribeToChannelMutation();
+    const [toggleSubscription] = useToggleSubscriptionMutation();
+
+    const handleSubscriptionToggle = async () => {
+        if (isOwnProfile) return;
+
+        setIsSubscribing(true);
+        try {
+            if (isSubscribed) {
+                await toggleSubscription(profile._id).unwrap();
+                setIsSubscribed(false);
+                toast({
+                    title: `Unsubscribed from ${profile.displayName}`,
+                    description: "You will no longer receive notifications.",
+                });
+            } else {
+                await toggleSubscription(profile._id).unwrap();
+                setIsSubscribed(true);
+                toast({
+                    title: `Subscribed to ${profile.displayName}`,
+                    description: "You will now receive notifications.",
+                });
+            }
+        } catch (error) {
+            console.error("Subscription error:", error);
+            toast({
+                title: "Error",
+                description: "Failed to update subscription status.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsSubscribing(false);
+        }
+    };
+
+    // Edit functions (only for own profile)
     const openEditDetails = () => {
+        if (!isOwnProfile) return;
         setEditDetailsState({
             displayName: profile.displayName,
             username: profile.username,
@@ -156,12 +233,14 @@ export default function ChannelPage() {
     };
 
     const openEditBanner = () => {
-        setTempBannerUrl(profile.banner);
+        if (!isOwnProfile) return;
+        setTempBannerUrl(profile.coverImage);
         setTempBannerFile(null);
         setIsEditBannerOpen(true);
     };
 
     const openEditAvatar = () => {
+        if (!isOwnProfile) return;
         setTempAvatarUrl(profile.avatar);
         setTempAvatarFile(null);
         setIsEditAvatarOpen(true);
@@ -185,7 +264,7 @@ export default function ChannelPage() {
         }
 
         // Validate file size (5MB limit)
-        const maxSize = 5 * 1024 * 1024; // 5MB
+        const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
             toast({
                 title: "File too large",
@@ -215,7 +294,7 @@ export default function ChannelPage() {
         }
 
         // Validate file size (2MB limit)
-        const maxSize = 2 * 1024 * 1024; // 2MB
+        const maxSize = 2 * 1024 * 1024;
         if (file.size > maxSize) {
             toast({
                 title: "File too large",
@@ -233,16 +312,16 @@ export default function ChannelPage() {
     const [updateAccountDetails] = useUpdateAccountDetailsMutation();
 
     const saveDetails = async () => {
+        const formData = new FormData();
         let hasChanges = false;
 
         // Check text fields
         const textFields = ["displayName", "username", "description"];
-        const updatedValues = {};
         textFields.forEach((field) => {
             const profileValue = String(profile[field] || "").trim();
             const editValue = String(editDetailsState[field] || "").trim();
             if (profileValue !== editValue) {
-                updatedValues[field] = editValue;
+                formData.append(field, editValue);
                 hasChanges = true;
             }
         });
@@ -256,8 +335,7 @@ export default function ChannelPage() {
         }
 
         try {
-            await updateAccountDetails(updatedValues).unwrap();
-            navigate(`/@${editDetailsState?.username || profile.username}`);
+            await updateAccountDetails(formData).unwrap();
             setIsEditDetailsOpen(false);
             toast({
                 title: "Channel details updated",
@@ -272,9 +350,9 @@ export default function ChannelPage() {
             });
         }
     };
-    const [updateBanner] = useUpdateBannerMutation();
+
     const saveBanner = async () => {
-        if (!tempBannerFile && tempBannerUrl === profile.banner) {
+        if (!tempBannerFile && tempBannerUrl === profile.coverImage) {
             toast({
                 title: "No changes detected",
                 description: "Banner is already up to date.",
@@ -284,14 +362,13 @@ export default function ChannelPage() {
 
         const formData = new FormData();
         if (tempBannerFile) {
-            formData.append("banner", tempBannerFile);
+            formData.append("coverImage", tempBannerFile);
         } else if (!tempBannerUrl) {
-            // Handle banner removal if needed
-            formData.append("removeBanner", "true");
+            formData.append("removeCoverImage", "true");
         }
 
         try {
-            await updateBanner(formData).unwrap();
+            await updateAccountDetails(formData).unwrap();
             setIsEditBannerOpen(false);
             toast({
                 title: "Banner updated",
@@ -307,7 +384,6 @@ export default function ChannelPage() {
         }
     };
 
-    const [updateAvatar] = useUpdateAvatarMutation();
     const saveAvatar = async () => {
         if (!tempAvatarFile && tempAvatarUrl === profile.avatar) {
             toast({
@@ -321,12 +397,11 @@ export default function ChannelPage() {
         if (tempAvatarFile) {
             formData.append("avatar", tempAvatarFile);
         } else if (!tempAvatarUrl) {
-            // Handle avatar removal if needed
             formData.append("removeAvatar", "true");
         }
 
         try {
-            await updateAvatar(formData).unwrap();
+            await updateAccountDetails(formData).unwrap();
             setIsEditAvatarOpen(false);
             toast({
                 title: "Avatar updated",
@@ -352,6 +427,18 @@ export default function ChannelPage() {
         setTempAvatarFile(null);
     };
 
+    const handleShareChannel = () => {
+        const channelUrl = `${window.location.origin}/channel/@${profile.username}`;
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(channelUrl).then(() => {
+                toast({
+                    title: "Link copied!",
+                    description: "Channel URL copied to clipboard.",
+                });
+            });
+        }
+    };
+
     const subscriberLabel = useMemo(() => {
         const n = profile?.subscribersCount || 0;
         if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M subscribers`;
@@ -359,13 +446,37 @@ export default function ChannelPage() {
         return `${n} subscriber${n === 1 ? "" : "s"}`;
     }, [profile?.subscribersCount]);
 
+    // Loading state
+    if (isUserLoading) {
+        return (
+            <div className="container mx-auto py-10 px-4 min-h-screen flex items-center justify-center">
+                <p>Loading channel...</p>
+            </div>
+        );
+    }
+
+    // Error state
+    if (userError) {
+        return (
+            <div className="container mx-auto py-10 px-4 min-h-screen flex items-center justify-center">
+                <div className="text-center space-y-4">
+                    <h1 className="text-2xl font-bold">Channel not found</h1>
+                    <p className="text-muted-foreground">
+                        The channel you're looking for doesn't exist.
+                    </p>
+                    <Button onClick={() => navigate("/")}>Go Home</Button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="container mx-auto py-6 px-4 lg:px-6">
             {/* Banner */}
             <div className="relative w-full h-48 sm:h-56 md:h-64 rounded-xl overflow-hidden bg-muted group">
-                {profile.banner ? (
+                {profile.coverImage ? (
                     <img
-                        src={profile.banner || "/placeholder.svg"}
+                        src={profile.coverImage || "/placeholder.svg"}
                         alt="Channel banner"
                         className="w-full h-full object-cover"
                     />
@@ -374,23 +485,31 @@ export default function ChannelPage() {
                         <div className="text-center space-y-2">
                             <ImageIcon className="h-8 w-8 mx-auto" />
                             <p className="text-sm">
-                                Add a banner to showcase your channel
+                                {isOwnProfile
+                                    ? "Add a banner to showcase your channel"
+                                    : "No banner set"}
                             </p>
                         </div>
                     </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-                <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm"
-                        onClick={openEditBanner}
-                    >
-                        <Camera className="mr-2 h-4 w-4" />
-                        {profile.banner ? "Change banner" : "Add banner"}
-                    </Button>
-                </div>
+
+                {/* Edit banner button - only for own profile */}
+                {isOwnProfile && (
+                    <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm"
+                            onClick={openEditBanner}
+                        >
+                            <Camera className="mr-2 h-4 w-4" />
+                            {profile.coverImage
+                                ? "Change banner"
+                                : "Add banner"}
+                        </Button>
+                    </div>
+                )}
             </div>
 
             {/* Channel header */}
@@ -410,45 +529,91 @@ export default function ChannelPage() {
                                 </div>
                             )}
                         </div>
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm"
-                            onClick={openEditAvatar}
-                        >
-                            <Camera className="h-4 w-4" />
-                        </Button>
+
+                        {/* Edit avatar button - only for own profile */}
+                        {isOwnProfile && (
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm"
+                                onClick={openEditAvatar}
+                            >
+                                <Camera className="h-4 w-4" />
+                            </Button>
+                        )}
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold">
                             {profile.displayName}
                         </h1>
                         <div className="text-sm text-muted-foreground">
-                            {profile.username} • {subscriberLabel}
+                            @{profile.username} • {subscriberLabel}
                         </div>
                     </div>
                 </div>
+
                 <div className="sm:ml-auto flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        className="bg-transparent"
-                        onClick={openEditDetails}
-                    >
-                        <Edit2 className="mr-2 h-4 w-4" /> Edit details
-                    </Button>
-                    <Button
-                        variant="outline"
-                        className="bg-transparent"
-                        onClick={() => navigate("/your-videos")}
-                    >
-                        <Settings className="mr-2 h-4 w-4" /> Manage videos
-                    </Button>
-                    <Button
-                        variant="default"
-                        onClick={() => navigate("/upload")}
-                    >
-                        <Upload className="mr-2 h-4 w-4" /> Upload
-                    </Button>
+                    {isOwnProfile ? (
+                        // Own profile actions
+                        <>
+                            <Button
+                                variant="outline"
+                                className="bg-transparent"
+                                onClick={openEditDetails}
+                            >
+                                <Edit2 className="mr-2 h-4 w-4" /> Edit details
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="bg-transparent"
+                                onClick={() => navigate("/your-videos")}
+                            >
+                                <Settings className="mr-2 h-4 w-4" /> Manage
+                                videos
+                            </Button>
+                            <Button
+                                variant="default"
+                                onClick={() => navigate("/upload")}
+                            >
+                                <Upload className="mr-2 h-4 w-4" /> Upload
+                            </Button>
+                        </>
+                    ) : (
+                        // Other user profile actions
+                        <>
+                            <Button
+                                variant="outline"
+                                className="bg-transparent"
+                                onClick={handleShareChannel}
+                            >
+                                <Share2 className="mr-2 h-4 w-4" /> Share
+                            </Button>
+                            <Button
+                                variant={isSubscribed ? "secondary" : "default"}
+                                onClick={handleSubscriptionToggle}
+                                disabled={isSubscribing}
+                                className={
+                                    isSubscribed
+                                        ? ""
+                                        : "bg-red-600 hover:bg-red-700 text-white"
+                                }
+                            >
+                                {isSubscribing ? (
+                                    "Loading..."
+                                ) : isSubscribed ? (
+                                    <>
+                                        <Check className="mr-2 h-4 w-4" />{" "}
+                                        Subscribed
+                                    </>
+                                ) : (
+                                    <>
+                                        <Bell className="mr-2 h-4 w-4" />{" "}
+                                        Subscribe
+                                    </>
+                                )}
+                            </Button>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -493,7 +658,6 @@ export default function ChannelPage() {
                                                     <img
                                                         src={
                                                             featuredVideo.thumbnail ||
-                                                            "/placeholder.svg" ||
                                                             "/placeholder.svg"
                                                         }
                                                         alt={
@@ -529,16 +693,20 @@ export default function ChannelPage() {
                                     ) : (
                                         <div className="text-center py-10 space-y-3">
                                             <p className="text-muted-foreground">
-                                                No videos yet
+                                                {isOwnProfile
+                                                    ? "No videos yet"
+                                                    : "No videos available"}
                                             </p>
-                                            <Button
-                                                onClick={() =>
-                                                    navigate("/upload")
-                                                }
-                                            >
-                                                <Plus className="mr-2 h-4 w-4" />{" "}
-                                                Upload your first video
-                                            </Button>
+                                            {isOwnProfile && (
+                                                <Button
+                                                    onClick={() =>
+                                                        navigate("/upload")
+                                                    }
+                                                >
+                                                    <Plus className="mr-2 h-4 w-4" />{" "}
+                                                    Upload your first video
+                                                </Button>
+                                            )}
                                         </div>
                                     )}
                                 </CardContent>
@@ -551,7 +719,8 @@ export default function ChannelPage() {
                                 </CardHeader>
                                 <CardContent className="space-y-3">
                                     <p className="text-sm whitespace-pre-line">
-                                        {profile.description}
+                                        {profile.description ||
+                                            "No description available."}
                                     </p>
                                     <Separator />
                                     <div className="flex items-center justify-between text-sm">
@@ -571,7 +740,9 @@ export default function ChannelPage() {
                         <div className="mt-6">
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="text-lg font-semibold">
-                                    Latest uploads
+                                    {isOwnProfile
+                                        ? "Latest uploads"
+                                        : "Recent videos"}
                                 </h3>
                                 {uploadedVideos?.length > 0 && (
                                     <Button
@@ -586,13 +757,19 @@ export default function ChannelPage() {
                                 <Card>
                                     <CardContent className="p-8 text-center space-y-2">
                                         <p className="text-muted-foreground">
-                                            No uploads yet.
+                                            {isOwnProfile
+                                                ? "No uploads yet."
+                                                : "No videos available."}
                                         </p>
-                                        <Button
-                                            onClick={() => navigate("/upload")}
-                                        >
-                                            Upload a video
-                                        </Button>
+                                        {isOwnProfile && (
+                                            <Button
+                                                onClick={() =>
+                                                    navigate("/upload")
+                                                }
+                                            >
+                                                Upload a video
+                                            </Button>
+                                        )}
                                     </CardContent>
                                 </Card>
                             ) : (
@@ -625,12 +802,18 @@ export default function ChannelPage() {
                             <Card>
                                 <CardContent className="p-8 text-center space-y-2">
                                     <p className="text-muted-foreground">
-                                        You haven't uploaded any videos yet.
+                                        {isOwnProfile
+                                            ? "You haven't uploaded any videos yet."
+                                            : "This channel has no videos yet."}
                                     </p>
-                                    <Button onClick={() => navigate("/upload")}>
-                                        <Upload className="mr-2 h-4 w-4" />{" "}
-                                        Upload video
-                                    </Button>
+                                    {isOwnProfile && (
+                                        <Button
+                                            onClick={() => navigate("/upload")}
+                                        >
+                                            <Upload className="mr-2 h-4 w-4" />{" "}
+                                            Upload video
+                                        </Button>
+                                    )}
                                 </CardContent>
                             </Card>
                         ) : (
@@ -660,26 +843,34 @@ export default function ChannelPage() {
                     <TabsContent value="playlists">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-semibold">Playlists</h3>
-                            <Button
-                                variant="outline"
-                                className="bg-transparent"
-                                onClick={() => navigate("/playlists")}
-                            >
-                                Manage playlists
-                            </Button>
+                            {isOwnProfile && (
+                                <Button
+                                    variant="outline"
+                                    className="bg-transparent"
+                                    onClick={() => navigate("/playlists")}
+                                >
+                                    Manage playlists
+                                </Button>
+                            )}
                         </div>
                         {playlists.length === 0 ? (
                             <Card>
                                 <CardContent className="p-8 text-center space-y-2">
                                     <p className="text-muted-foreground">
-                                        No playlists yet.
+                                        {isOwnProfile
+                                            ? "No playlists yet."
+                                            : "No public playlists available."}
                                     </p>
-                                    <Button
-                                        onClick={() => navigate("/playlists")}
-                                    >
-                                        <Plus className="mr-2 h-4 w-4" /> Create
-                                        playlist
-                                    </Button>
+                                    {isOwnProfile && (
+                                        <Button
+                                            onClick={() =>
+                                                navigate("/playlists")
+                                            }
+                                        >
+                                            <Plus className="mr-2 h-4 w-4" />{" "}
+                                            Create playlist
+                                        </Button>
+                                    )}
                                 </CardContent>
                             </Card>
                         ) : (
@@ -706,7 +897,8 @@ export default function ChannelPage() {
                                         Description
                                     </h3>
                                     <p className="text-sm whitespace-pre-line">
-                                        {profile.description}
+                                        {profile.description ||
+                                            "No description available."}
                                     </p>
                                 </div>
                                 <Separator />
@@ -724,7 +916,7 @@ export default function ChannelPage() {
                                             Handle
                                         </span>
                                         <span className="font-medium">
-                                            {profile.username}
+                                            @{profile.username}
                                         </span>
                                     </div>
                                     <div className="flex items-center justify-between">
@@ -744,281 +936,312 @@ export default function ChannelPage() {
                                         </span>
                                     </div>
                                 </div>
-                                <div className="pt-2">
-                                    <Button
-                                        variant="outline"
-                                        className="bg-transparent"
-                                        onClick={openEditDetails}
-                                    >
-                                        <Edit2 className="mr-2 h-4 w-4" /> Edit
-                                        channel details
-                                    </Button>
-                                </div>
+                                {isOwnProfile && (
+                                    <div className="pt-2">
+                                        <Button
+                                            variant="outline"
+                                            className="bg-transparent"
+                                            onClick={openEditDetails}
+                                        >
+                                            <Edit2 className="mr-2 h-4 w-4" />{" "}
+                                            Edit channel details
+                                        </Button>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </TabsContent>
                 </Tabs>
             </div>
 
-            {/* Edit Channel Details Dialog */}
-            <Dialog
-                open={isEditDetailsOpen}
-                onOpenChange={setIsEditDetailsOpen}
-            >
-                <DialogContent className="sm:max-w-[480px]">
-                    <DialogHeader>
-                        <DialogTitle>Edit channel details</DialogTitle>
-                        <DialogDescription>
-                            Update your channel's name, username, and
-                            description.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-2">
-                        <div className="grid sm:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="name">Channel name</Label>
-                                <Input
-                                    id="name"
-                                    value={editDetailsState.displayName}
-                                    onChange={(e) =>
-                                        setEditDetailsState((s) => ({
-                                            ...s,
-                                            displayName: e.target.value,
-                                        }))
-                                    }
-                                    placeholder="Enter channel name"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="username">Username</Label>
-                                <Input
-                                    id="username"
-                                    value={editDetailsState.username}
-                                    onChange={(e) =>
-                                        setEditDetailsState((s) => ({
-                                            ...s,
-                                            username: e.target.value,
-                                        }))
-                                    }
-                                    placeholder="@username"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="description">Description</Label>
-                            <Textarea
-                                id="description"
-                                rows={4}
-                                value={editDetailsState.description}
-                                onChange={(e) =>
-                                    setEditDetailsState((s) => ({
-                                        ...s,
-                                        description: e.target.value,
-                                    }))
-                                }
-                                placeholder="Tell viewers about your channel"
-                            />
-                            <p className="text-xs text-muted-foreground">
-                                {editDetailsState.description.length}/1000
-                                characters
-                            </p>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => setIsEditDetailsOpen(false)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button onClick={saveDetails}>Save changes</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
-            {/* Edit Banner Dialog */}
-            <Dialog open={isEditBannerOpen} onOpenChange={setIsEditBannerOpen}>
-                <DialogContent className="sm:max-w-[600px]">
-                    <DialogHeader>
-                        <DialogTitle>Edit channel banner</DialogTitle>
-                        <DialogDescription>
-                            Upload a banner image to represent your channel.
-                            Recommended size: 2560 x 1440 pixels.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4 py-2">
-                        {/* Banner Preview */}
-                        <div className="relative w-full h-40 rounded-lg overflow-hidden bg-muted">
-                            {tempBannerUrl ? (
-                                <>
-                                    <img
-                                        src={
-                                            tempBannerUrl || "/placeholder.svg"
-                                        }
-                                        alt="Banner preview"
-                                        className="w-full h-full object-cover"
-                                    />
-                                    <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        className="absolute top-2 right-2"
-                                        onClick={removeBanner}
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                </>
-                            ) : (
-                                <div className="w-full h-full grid place-items-center text-muted-foreground">
-                                    <div className="text-center space-y-2">
-                                        <ImageIcon className="h-8 w-8 mx-auto" />
-                                        <p className="text-sm">
-                                            No banner selected
-                                        </p>
+            {/* Edit Dialogs - Only render for own profile */}
+            {isOwnProfile && (
+                <>
+                    {/* Edit Channel Details Dialog */}
+                    <Dialog
+                        open={isEditDetailsOpen}
+                        onOpenChange={setIsEditDetailsOpen}
+                    >
+                        <DialogContent className="sm:max-w-[480px]">
+                            <DialogHeader>
+                                <DialogTitle>Edit channel details</DialogTitle>
+                                <DialogDescription>
+                                    Update your channel's name, username, and
+                                    description.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-2">
+                                <div className="grid sm:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="name">
+                                            Channel name
+                                        </Label>
+                                        <Input
+                                            id="name"
+                                            value={editDetailsState.displayName}
+                                            onChange={(e) =>
+                                                setEditDetailsState((s) => ({
+                                                    ...s,
+                                                    displayName: e.target.value,
+                                                }))
+                                            }
+                                            placeholder="Enter channel name"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="username">
+                                            Username
+                                        </Label>
+                                        <Input
+                                            id="username"
+                                            value={editDetailsState.username}
+                                            onChange={(e) =>
+                                                setEditDetailsState((s) => ({
+                                                    ...s,
+                                                    username: e.target.value,
+                                                }))
+                                            }
+                                            placeholder="@username"
+                                        />
                                     </div>
                                 </div>
-                            )}
-                        </div>
 
-                        {/* Upload Controls */}
-                        <div className="flex gap-2">
-                            <Button
-                                onClick={handleBannerPick}
-                                className="flex-1"
-                            >
-                                <ImageIcon className="mr-2 h-4 w-4" />
-                                {tempBannerUrl
-                                    ? "Change banner"
-                                    : "Upload banner"}
-                            </Button>
-                            {tempBannerUrl && (
+                                <div className="space-y-2">
+                                    <Label htmlFor="description">
+                                        Description
+                                    </Label>
+                                    <Textarea
+                                        id="description"
+                                        rows={4}
+                                        value={editDetailsState.description}
+                                        onChange={(e) =>
+                                            setEditDetailsState((s) => ({
+                                                ...s,
+                                                description: e.target.value,
+                                            }))
+                                        }
+                                        placeholder="Tell viewers about your channel"
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                        {editDetailsState.description.length}
+                                        /1000 characters
+                                    </p>
+                                </div>
+                            </div>
+                            <DialogFooter>
                                 <Button
                                     variant="outline"
-                                    onClick={removeBanner}
-                                    className="bg-transparent"
+                                    onClick={() => setIsEditDetailsOpen(false)}
                                 >
-                                    <X className="mr-2 h-4 w-4" /> Remove
+                                    Cancel
                                 </Button>
-                            )}
-                        </div>
+                                <Button onClick={saveDetails}>
+                                    Save changes
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
 
-                        <input
-                            ref={bannerInputRef}
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={onBannerChange}
-                        />
-
-                        <div className="text-xs text-muted-foreground space-y-1">
-                            <p>• Recommended size: 2560 x 1440 pixels</p>
-                            <p>• Maximum file size: 5MB</p>
-                            <p>• Supported formats: JPG, PNG, GIF</p>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => setIsEditBannerOpen(false)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button onClick={saveBanner}>Save banner</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
-            {/* Edit Avatar Dialog */}
-            <Dialog open={isEditAvatarOpen} onOpenChange={setIsEditAvatarOpen}>
-                <DialogContent className="sm:max-w-[480px]">
-                    <DialogHeader>
-                        <DialogTitle>Edit channel avatar</DialogTitle>
-                        <DialogDescription>
-                            Upload a profile picture for your channel. It will
-                            appear as a circle.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4 py-2">
-                        {/* Avatar Preview */}
-                        <div className="flex justify-center">
-                            <div className="relative">
-                                <div className="h-32 w-32 rounded-full overflow-hidden bg-muted ring-4 ring-background">
-                                    {tempAvatarUrl ? (
-                                        <img
-                                            src={
-                                                tempAvatarUrl ||
-                                                "/placeholder.svg"
-                                            }
-                                            alt="Avatar preview"
-                                            className="w-full h-full object-cover"
-                                        />
+                    {/* Edit Banner Dialog */}
+                    <Dialog
+                        open={isEditBannerOpen}
+                        onOpenChange={setIsEditBannerOpen}
+                    >
+                        <DialogContent className="sm:max-w-[600px]">
+                            <DialogHeader>
+                                <DialogTitle>Edit channel banner</DialogTitle>
+                                <DialogDescription>
+                                    Upload a banner image to represent your
+                                    channel. Recommended size: 2560 x 1440
+                                    pixels.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4 py-2">
+                                {/* Banner Preview */}
+                                <div className="relative w-full h-40 rounded-lg overflow-hidden bg-muted">
+                                    {tempBannerUrl ? (
+                                        <>
+                                            <img
+                                                src={
+                                                    tempBannerUrl ||
+                                                    "/placeholder.svg"
+                                                }
+                                                alt="Banner preview"
+                                                className="w-full h-full object-cover"
+                                            />
+                                            <Button
+                                                variant="destructive"
+                                                size="sm"
+                                                className="absolute top-2 right-2"
+                                                onClick={removeBanner}
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        </>
                                     ) : (
                                         <div className="w-full h-full grid place-items-center text-muted-foreground">
-                                            <Camera className="h-8 w-8" />
+                                            <div className="text-center space-y-2">
+                                                <ImageIcon className="h-8 w-8 mx-auto" />
+                                                <p className="text-sm">
+                                                    No banner selected
+                                                </p>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
-                                {tempAvatarUrl && (
-                                    <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        className="absolute -top-2 -right-2 rounded-full h-8 w-8 p-0"
-                                        onClick={removeAvatar}
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                )}
-                            </div>
-                        </div>
 
-                        {/* Upload Controls */}
-                        <div className="flex gap-2">
-                            <Button
-                                onClick={handleAvatarPick}
-                                className="flex-1"
-                            >
-                                <Camera className="mr-2 h-4 w-4" />
-                                {tempAvatarUrl
-                                    ? "Change avatar"
-                                    : "Upload avatar"}
-                            </Button>
-                            {tempAvatarUrl && (
+                                {/* Upload Controls */}
+                                <div className="flex gap-2">
+                                    <Button
+                                        onClick={handleBannerPick}
+                                        className="flex-1"
+                                    >
+                                        <ImageIcon className="mr-2 h-4 w-4" />
+                                        {tempBannerUrl
+                                            ? "Change banner"
+                                            : "Upload banner"}
+                                    </Button>
+                                    {tempBannerUrl && (
+                                        <Button
+                                            variant="outline"
+                                            onClick={removeBanner}
+                                            className="bg-transparent"
+                                        >
+                                            <X className="mr-2 h-4 w-4" />{" "}
+                                            Remove
+                                        </Button>
+                                    )}
+                                </div>
+
+                                <input
+                                    ref={bannerInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={onBannerChange}
+                                />
+
+                                <div className="text-xs text-muted-foreground space-y-1">
+                                    <p>
+                                        • Recommended size: 2560 x 1440 pixels
+                                    </p>
+                                    <p>• Maximum file size: 5MB</p>
+                                    <p>• Supported formats: JPG, PNG, GIF</p>
+                                </div>
+                            </div>
+                            <DialogFooter>
                                 <Button
                                     variant="outline"
-                                    onClick={removeAvatar}
-                                    className="bg-transparent"
+                                    onClick={() => setIsEditBannerOpen(false)}
                                 >
-                                    <X className="mr-2 h-4 w-4" /> Remove
+                                    Cancel
                                 </Button>
-                            )}
-                        </div>
+                                <Button onClick={saveBanner}>
+                                    Save banner
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
 
-                        <input
-                            ref={avatarInputRef}
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={onAvatarChange}
-                        />
+                    {/* Edit Avatar Dialog */}
+                    <Dialog
+                        open={isEditAvatarOpen}
+                        onOpenChange={setIsEditAvatarOpen}
+                    >
+                        <DialogContent className="sm:max-w-[480px]">
+                            <DialogHeader>
+                                <DialogTitle>Edit channel avatar</DialogTitle>
+                                <DialogDescription>
+                                    Upload a profile picture for your channel.
+                                    It will appear as a circle.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4 py-2">
+                                {/* Avatar Preview */}
+                                <div className="flex justify-center">
+                                    <div className="relative">
+                                        <div className="h-32 w-32 rounded-full overflow-hidden bg-muted ring-4 ring-background">
+                                            {tempAvatarUrl ? (
+                                                <img
+                                                    src={
+                                                        tempAvatarUrl ||
+                                                        "/placeholder.svg"
+                                                    }
+                                                    alt="Avatar preview"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full grid place-items-center text-muted-foreground">
+                                                    <Camera className="h-8 w-8" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        {tempAvatarUrl && (
+                                            <Button
+                                                variant="destructive"
+                                                size="sm"
+                                                className="absolute -top-2 -right-2 rounded-full h-8 w-8 p-0"
+                                                onClick={removeAvatar}
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
 
-                        <div className="text-xs text-muted-foreground space-y-1">
-                            <p>• Recommended size: 800 x 800 pixels</p>
-                            <p>• Maximum file size: 2MB</p>
-                            <p>• Supported formats: JPG, PNG, GIF</p>
-                            <p>• Image will be cropped to a circle</p>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => setIsEditAvatarOpen(false)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button onClick={saveAvatar}>Save avatar</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                                {/* Upload Controls */}
+                                <div className="flex gap-2">
+                                    <Button
+                                        onClick={handleAvatarPick}
+                                        className="flex-1"
+                                    >
+                                        <Camera className="mr-2 h-4 w-4" />
+                                        {tempAvatarUrl
+                                            ? "Change avatar"
+                                            : "Upload avatar"}
+                                    </Button>
+                                    {tempAvatarUrl && (
+                                        <Button
+                                            variant="outline"
+                                            onClick={removeAvatar}
+                                            className="bg-transparent"
+                                        >
+                                            <X className="mr-2 h-4 w-4" />{" "}
+                                            Remove
+                                        </Button>
+                                    )}
+                                </div>
+
+                                <input
+                                    ref={avatarInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={onAvatarChange}
+                                />
+
+                                <div className="text-xs text-muted-foreground space-y-1">
+                                    <p>• Recommended size: 800 x 800 pixels</p>
+                                    <p>• Maximum file size: 2MB</p>
+                                    <p>• Supported formats: JPG, PNG, GIF</p>
+                                    <p>• Image will be cropped to a circle</p>
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setIsEditAvatarOpen(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button onClick={saveAvatar}>
+                                    Save avatar
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </>
+            )}
         </div>
     );
 }
