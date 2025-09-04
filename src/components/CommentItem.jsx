@@ -14,14 +14,11 @@ import { useToast } from "../hooks/use-toast";
 import { useToggleCommentLikeMutation } from "../features/likes/likesApiSlice";
 import { useToggleCommentDislikeMutation } from "../features/dislikes/dislikesApiSlice";
 
-function CommentItem({ comment, hasParent }) {
+function CommentItem({ comment, hasParent, refetch }) {
     const dispatch = useDispatch();
     const { toast } = useToast();
     const { videoId } = useParams();
-    const [
-        createVideoComment,
-        { isSuccess: newCommentSuccess, isLoading: newCommentLoading },
-    ] = useCreateVideoCommentMutation();
+    const [createVideoComment] = useCreateVideoCommentMutation();
 
     const [toggleCommentLike] = useToggleCommentLikeMutation();
     const [toggleCommentDislike] = useToggleCommentDislikeMutation();
@@ -50,7 +47,7 @@ function CommentItem({ comment, hasParent }) {
                 content: replyText,
                 parentCommentId: comment._id,
             }).unwrap();
-
+            await refetch();
             setReplyText("");
             setShowReplyInput(false);
             toast({
@@ -116,7 +113,7 @@ function CommentItem({ comment, hasParent }) {
             const updatedDislike = await toggleCommentDislike(
                 comment?._id
             ).unwrap();
-            
+
             const newObj = {
                 _id: comment?._id,
                 content: comment?.content,

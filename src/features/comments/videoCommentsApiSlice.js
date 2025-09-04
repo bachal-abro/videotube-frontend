@@ -23,34 +23,6 @@ export const videoCommentsApiSlice = apiSlice.injectEndpoints({
                 method: "POST",
                 body: { content, parentCommentId },
             }),
-            async onQueryStarted({ videoId }, { queryFulfilled, dispatch }) {
-                try {
-                    const { data } = await queryFulfilled; // response structure
-
-                    dispatch(
-                        videoCommentsApiSlice.util.updateQueryData(
-                            "getVideoComments",
-                            videoId,
-                            (draft) => {
-                                const newComment = data?.data;
-
-                                if (!newComment || !draft?.data) return;
-
-                                // ✅ Prevent duplicates
-                                const alreadyExists = draft.data.some(
-                                    (c) => c._id === newComment._id
-                                );
-
-                                if (!alreadyExists) {
-                                    draft.data.push(newComment);
-                                }
-                            }
-                        )
-                    );
-                } catch (err) {
-                    console.error("Error updating comment cache:", err);
-                }
-            },
         }),
 
         // 🟡 UPDATE an existing comment

@@ -13,6 +13,7 @@ import { Button } from "../components/ui/button";
 import { timeAgo } from "../utils/timeAgo";
 import { useToast } from "../hooks/use-toast";
 import CommentItem from "./CommentItem";
+
 const CommentSection = () => {
     const { toast } = useToast();
     const { videoId } = useParams();
@@ -24,65 +25,88 @@ const CommentSection = () => {
     const [page, setPage] = useState(1);
     const { user } = useSelector((store) => store.auth);
     const { data, isSuccess, isFetching, isLoading, isError, refetch } =
-        useGetVideoCommentsQuery({ videoId, page, limit: 10 });
+        useGetVideoCommentsQuery({ videoId, page, limit: 10, sort: "desc" });
 
-    let hasNextPage = false;
+    const [createVideoComment] = useCreateVideoCommentMutation();
 
-    // const hasNextPage = data?.pagination?.hasNextPage;
-
-    const [
-        createVideoComment,
-        { isSuccess: newCommentSuccess, isLoading: newCommentLoading },
-    ] = useCreateVideoCommentMutation();
+    const [hasNextPage, setHasNextPage] = useState(false);
 
     useEffect(() => {
-        if (isSuccess && data?.data) {
-            hasNextPage =
-                data?.pagination?.totalCommentsCount - page * 10 ? true : false;
+        if (!isSuccess || !data?.data) return;
 
+        const total = data?.pagination?.totalCommentsCount ?? 0;
+        const limit = Number(10);
+        setHasNextPage(page * limit < total);
+
+        if (page === 1) {
             dispatch(setCurrentVideoComments(data.data));
-            const handleScroll = () => {
-                if (
-                    window.innerHeight + window.scrollY >=
-                        document.body.offsetHeight - 200 &&
-                    !isFetching &&
-                    hasNextPage
-                ) {
-                    dispatch(setCurrentVideoComments(data.data));
-                    setPage((prev) => prev + 1);
-                }
-            };
-
-            window.addEventListener("scroll", handleScroll);
-            return () => window.removeEventListener("scroll", handleScroll);
-            console.log(data);
+        } else {
+            // Append only unique items by _id
+            const existingIds = new Set(commentsList.map((c) => c._id));
+            const toAppend = data.data.filter((c) => !existingIds.has(c._id));
+            if (toAppend.length) {
+                dispatch(
+                    setCurrentVideoComments([...commentsList, ...toAppend])
+                );
+            }
         }
-    }, [isSuccess, data, isFetching, hasNextPage]);
+    }, [isSuccess, data, page, dispatch]);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (
+                window.innerHeight + window.scrollY >=
+                    document.body.offsetHeight - 200 &&
+                !isFetching &&
+                hasNextPage
+            ) {
+                setPage((p) => p + 1);
+            }
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [isFetching, hasNextPage]);
+
+    const uniqueTopLevel = React.useMemo(() => {
+        const seen = new Set();
+        return commentsList.filter((c) => {
+            if (c.parentComment) return false; // only top-level
+            if (seen.has(c._id)) return false;
+            seen.add(c._id);
+            return true;
+        });
+    }, [commentsList]);
+
+    const sortedComments = uniqueTopLevel.sort((a, b) => {
+        if (a.createdAt > b.createdAt) return -1;
+        if (a.createdAt < b.createdAt) return 1;
+        return 0;
+    });
 
     const handlePostComment = async (e) => {
         e.preventDefault();
-        if (commentText.trim()) {
-            try {
-                const newComment = await createVideoComment({
-                    videoId,
-                    content: commentText,
-                }).unwrap();
+        if (!commentText.trim()) return;
 
-                // Refetch comments (Recommended for consistency)
-                refetch();
-                console.log(newComment);
-                setCommentText("");
-                toast({
-                    title: "Comment posted!",
-                    description: "Your comment has been added.",
-                });
-            } catch (err) {
-                toast({
-                    title: "Error",
-                    description: "Failed to post comment.",
-                    variant: "destructive",
-                });
-            }
+        try {
+            await createVideoComment({
+                videoId,
+                content: commentText,
+            }).unwrap();
+            setCommentText("");
+            setPage(1); // ← reset page first
+            setPage(1);
+            await new Promise((r) => setTimeout(r, 0)); // microtask tick
+            await refetch();
+            toast({
+                title: "Comment posted!",
+                description: "Your comment has been added.",
+            });
+        } catch (err) {
+            toast({
+                title: "Error",
+                description: "Failed to post comment.",
+                variant: "destructive",
+            });
         }
     };
 
@@ -127,15 +151,14 @@ const CommentSection = () => {
                 </div>
             </div>
 
-            {/* Comments list */}
             <div className="space-y-4 pt-4">
-                {commentsList.map((comment) =>
-                    comment.parentComment ? (
-                        ""
-                    ) : (
-                        <CommentItem key={comment._id} comment={comment} />
-                    )
-                )}
+                {sortedComments.map((comment) => (
+                    <CommentItem
+                        key={comment._id}
+                        comment={comment}
+                        refetch={refetch}
+                    />
+                ))}
             </div>
         </div>
     );
