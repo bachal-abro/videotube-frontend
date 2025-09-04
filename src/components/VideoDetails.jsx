@@ -6,7 +6,7 @@ import VideoButtons from "./VideoButtons";
 import VideoDescription from "./VideoDescription";
 import SeparaterHr from "./SeparaterHr";
 import { useDispatch, useSelector } from "react-redux";
-import { timeAgo } from "../utils/timeAgo";
+import { timeAgo } from "../utils/timeFormats";
 
 const VideoDetails = () => {
     const video = useSelector((store) => store.video.currentVideo);

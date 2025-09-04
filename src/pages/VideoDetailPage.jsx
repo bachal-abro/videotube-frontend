@@ -30,7 +30,7 @@ import { videosData } from "../data/videos";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentVideo } from "../features/videos/videoSlice";
 import { useGetVideoByIdQuery } from "../features/videos/videosApiSlice";
-import { timeAgo } from "../utils/timeAgo";
+import { timeAgo } from "../utils/timeFormats";
 import { useToggleVideoLikeMutation } from "../features/likes/likesApiSlice";
 import { useToggleVideoDislikeMutation } from "../features/dislikes/dislikesApiSlice";
 import { useToggleSubscriptionMutation } from "../features/subscription/subscriptionApiSlice";

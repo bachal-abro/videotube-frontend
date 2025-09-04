@@ -7,7 +7,7 @@ import {
     ChevronDown,
     Trash2,
 } from "lucide-react";
-import { timeAgo } from "../utils/timeAgo";
+import { timeAgo, secondsToDuration } from "../utils/timeFormats";
 
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
@@ -92,7 +92,7 @@ export function PlaylistVideoCard({
                     className="w-full h-full object-cover"
                 />
                 <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1 py-0.5 rounded">
-                    {video.duration}
+                    {secondsToDuration(video.duration)}
                 </div>
             </div>
 

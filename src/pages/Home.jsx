@@ -7,7 +7,7 @@ import { useGetAllVideosQuery } from "../features/videos/videosApiSlice";
 import { videosData } from "../data/videos";
 import { categories } from "../data/categories"; // Import categories
 import { Button } from "../components/ui/button"; // Import Button
-import { timeAgo } from "../utils/timeAgo";
+import { timeAgo } from "../utils/timeFormats";
 
 const Home = () => {
     const { videoFeed } = useSelector((store) => store.video);

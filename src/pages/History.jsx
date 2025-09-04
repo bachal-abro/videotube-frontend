@@ -17,7 +17,7 @@ import {
     useRemoveVideoFromHistoryMutation,
 } from "../features/users/usersApiSlice";
 import { setHistory } from "../features/users/userSlice";
-import { timeAgo } from "../utils/timeAgo";
+import { timeAgo } from "../utils/timeFormats";
 
 export default function HistoryPage() {
     const [historyVideos, setHistoryVideos] = useState([]);

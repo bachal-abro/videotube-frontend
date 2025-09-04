@@ -9,7 +9,7 @@ import {
     useGetLikedVideosQuery,
     useToggleVideoLikeMutation,
 } from "../features/likes/likesApiSlice";
-import { timeAgo } from "../utils/timeAgo";
+import { timeAgo } from "../utils/timeFormats";
 
 export default function LikedVideosPage() {
     const [likedVideos, setLikedVideos] = useState([]);

@@ -53,7 +53,7 @@ import {
     useUpdateAvatarMutation,
 } from "../features/users/usersApiSlice";
 import { useToggleSubscriptionMutation } from "../features/subscription/subscriptionApiSlice";
-import { timeAgo } from "../utils/timeAgo";
+import { timeAgo } from "../utils/timeFormats";
 const TabsList = Tabs.List;
 const TabsTrigger = Tabs.Trigger;
 const TabsContent = Tabs.Content;

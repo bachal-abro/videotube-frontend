@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { cn } from "../lib/utils"; // Ensure cn utility is available
-import { timeAgo } from "../utils/timeAgo";
+import { timeAgo } from "../utils/timeFormats";
 import { useCreateVideoCommentMutation } from "../features/comments/videoCommentsApiSlice";
 import { setCurrentVideoComments } from "../features/comments/commentSlice";
 import { useDispatch, useSelector } from "react-redux";

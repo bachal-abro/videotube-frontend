@@ -10,7 +10,7 @@ import { Textarea } from "../components/ui/textarea";
 import { ThumbsUp, ThumbsDown, Send } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Button } from "../components/ui/button";
-import { timeAgo } from "../utils/timeAgo";
+import { timeAgo } from "../utils/timeFormats";
 import { useToast } from "../hooks/use-toast";
 import CommentItem from "./CommentItem";
 

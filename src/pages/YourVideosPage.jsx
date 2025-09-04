@@ -28,7 +28,8 @@ import {
     useGetAllVideosOfUserQuery,
     useToggleVisibilityStatusMutation,
 } from "../features/videos/videosApiSlice";
-import { timeAgo } from "../utils/timeAgo";
+import { timeAgo, secondsToDuration } from "../utils/timeFormats";
+import { useSelector } from "react-redux";
 
 export default function YourVideosPage() {
     const navigate = useNavigate();
@@ -230,7 +231,7 @@ export default function YourVideosPage() {
                                                     className="w-full h-full object-cover"
                                                 />
                                                 <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1 py-0.5 rounded">
-                                                    {video.duration}
+                                                    {secondsToDuration(video.duration)}
                                                 </div>
                                             </div>
 

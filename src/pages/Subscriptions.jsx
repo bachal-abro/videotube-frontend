@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { VideoCard } from "../components/video-card";
 import { setSubscriptionFeed } from "../features/videos/videoSlice";
 import { useGetVideosFromSubscriptionsQuery } from "../features/videos/videosApiSlice";
-import { timeAgo } from "../utils/timeAgo";
+import { timeAgo } from "../utils/timeFormats";
 
 const Subscriptions = () => {
     const { subscriptionFeed } = useSelector((store) => store.video);

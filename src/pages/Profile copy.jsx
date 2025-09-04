@@ -53,7 +53,7 @@ import {
     useUpdateBannerMutation,
     useUpdateAvatarMutation,
 } from "../features/users/usersApiSlice";
-import { timeAgo } from "../utils/timeAgo";
+import { timeAgo } from "../utils/timeFormats";
 
 const TabsList = Tabs.List;
 const TabsTrigger = Tabs.Trigger;

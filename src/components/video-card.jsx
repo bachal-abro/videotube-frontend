@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 import { cn } from "../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { timeAgo } from "../utils/timeAgo";
+import { timeAgo, secondsToDuration } from "../utils/timeFormats";
 
 export function VideoCard({
     id,
@@ -120,7 +120,7 @@ export function VideoCard({
                                 <span>{views}</span>
                             </div>
                             <div className="bg-black/40 backdrop-blur-sm text-white/90 text-xs font-medium px-2 py-0.5 rounded-full">
-                                {duration}
+                                {secondsToDuration(duration)}
                             </div>
                         </div>
                     </div>
@@ -152,7 +152,7 @@ export function VideoCard({
                             {channelName}
                         </p>
                         <p className="text-muted-foreground">
-                            {timestamp}
+                            {timeAgo(timestamp)}
                         </p>
                     </div>
                 </div>
