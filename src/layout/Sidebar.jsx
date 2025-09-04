@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
     Home,
@@ -26,6 +26,7 @@ import { cn } from "../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { useDispatch, useSelector } from "react-redux";
 import { setSidebarOpen } from "../features/system/systemSlice";
+import { useGetSubscribedChannelsQuery } from "../features/subscription/subscriptionApiSlice";
 
 const navigationItems = [
     { icon: Home, label: "Home", path: "/" },
@@ -35,34 +36,6 @@ const navigationItems = [
     { icon: ThumbsUp, label: "Liked Videos", path: "/liked" },
     { icon: ListVideo, label: "Playlists", path: "/playlists" },
     { icon: PlaySquare, label: "Your Videos", path: "/your-videos" },
-];
-
-const subscriptions = [
-    {
-        name: "Code Masters",
-        avatar: "https://placehold.co/32x32/orange/white?text=CM",
-        subscribers: "1.2M",
-    },
-    {
-        name: "React Tutorials",
-        avatar: "https://placehold.co/32x32/3b82f6/white?text=RT",
-        subscribers: "856K",
-    },
-    {
-        name: "Tech Insights",
-        avatar: "https://placehold.co/32x32/6366f1/white?text=TI",
-        subscribers: "3.4M",
-    },
-    {
-        name: "Web Design Pro",
-        avatar: "https://placehold.co/32x32/06b6d4/white?text=WD",
-        subscribers: "427K",
-    },
-    {
-        name: "JS Mastery",
-        avatar: "https://placehold.co/32x32/f59e0b/white?text=JS",
-        subscribers: "982K",
-    },
 ];
 
 const settingsItems = [
@@ -92,6 +65,16 @@ export function Sidebar() {
         }
     };
 
+    const [subscriptions, setSubscriptions] = useState([]);
+    const { data, isLoading, isSuccess } = useGetSubscribedChannelsQuery(
+        user?._id
+    );
+
+    useEffect(() => {
+        if (isSuccess && data?.data) {
+            setSubscriptions(data.data);
+        }
+    }, [data?.data, isSuccess, isLoading]);
     const SidebarItem = ({
         icon: Icon,
         label,
@@ -114,19 +97,20 @@ export function Sidebar() {
         </button>
     );
 
-    const SubscriptionItem = ({ name, avatar, subscribers }) => (
+    const SubscriptionItem = ({
+        username,
+        name,
+        avatar,
+        subscribers,
+    }) => (
         <button
-            onClick={() =>
-                handleNavigation(
-                    `/channel/${name.toLowerCase().replace(/\s+/g, "-")}`
-                )
-            }
+            onClick={() => handleNavigation(`/@${username}`)}
             className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 hover:bg-accent hover:text-accent-foreground group"
         >
             <Avatar className="h-6 w-6 flex-shrink-0">
                 <AvatarImage src={avatar || "/placeholder.svg"} alt={name} />
                 <AvatarFallback className="text-xs">
-                    {name.charAt(0)}
+                    {name?.charAt(0)}
                 </AvatarFallback>
             </Avatar>
             <div className="flex-1 text-left truncate">
@@ -192,11 +176,12 @@ export function Sidebar() {
                                 <div className="space-y-1 ml-2">
                                     {subscriptions.map((subscription) => (
                                         <SubscriptionItem
-                                            key={subscription.name}
-                                            name={subscription.name}
-                                            avatar={subscription.avatar}
+                                            key={subscription?._id}
+                                            name={subscription?.displayName}
+                                            username={subscription?.username}
+                                            avatar={subscription?.avatar}
                                             subscribers={
-                                                subscription.subscribers
+                                                subscription?.subscribersCount
                                             }
                                         />
                                     ))}

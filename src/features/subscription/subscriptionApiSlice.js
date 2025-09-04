@@ -4,15 +4,12 @@ export const subscriptionApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         getSubscribers: builder.query({
             query: (channelId) => `subscriptions/u/${channelId}`,
-            keepUnusedDataFor: 60,
         }),
         getSubscribedChannels: builder.query({
             query: (userId) => `subscriptions/c/${userId}`,
-            keepUnusedDataFor: 60,
         }),
         getSubscriptionStatus: builder.query({
             query: (channelId) => `subscriptions/s/${channelId}`,
-            keepUnusedDataFor: 60,
         }),
         toggleSubscription: builder.mutation({
             query: (userId) => ({
