@@ -37,6 +37,10 @@ const Header = () => {
     const handleRedirectToProfile = () => {
         navigate(`/@${user?.username}`);
     };
+    const handleRedirectToDashboard = () => {
+        navigate(`/dashboard`);
+    };
+
     const [logout] = useLogoutMutation();
     const handleLogOut = async () => {
         await logout();
@@ -199,7 +203,10 @@ const Header = () => {
                                     <Button
                                         variant="ghost"
                                         className="w-full justify-start text-sm"
-                                        onClick={() => setProfileOpen(false)} // close popover
+                                        onClick={() => {
+                                            setProfileOpen(false);
+                                            handleRedirectToDashboard();
+                                        }} // close popover
                                     >
                                         <Settings className="mr-2 h-4 w-4" />{" "}
                                         YouTube Studio

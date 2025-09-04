@@ -11,6 +11,7 @@ import PlaylistDetailPage from "./PlaylistDetailPage.jsx";
 import UploadPage from "./UploadPage.jsx";
 import YourVideosPage from "./YourVideosPage.jsx";
 import LikedVideosPage from "./LikedVideosPage.jsx";
+import DashboardPage from "./DashboardPage.jsx";
 import VideoDetailPage from "./VideoDetailPage.jsx";
 export {
     HomePage,
@@ -27,4 +28,5 @@ export {
     UploadPage,
     YourVideosPage,
     VideoDetailPage,
+    DashboardPage,
 };

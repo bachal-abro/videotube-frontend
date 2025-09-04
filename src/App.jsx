@@ -14,6 +14,7 @@ import {
     YourVideosPage,
     SignupPage,
     VideoDetailPage,
+    DashboardPage,
 } from "./pages/index";
 
 import Layout from "./layout/Layout";
@@ -64,6 +65,7 @@ function App() {
                             path="your-videos"
                             element={<YourVideosPage />}
                         />
+                        <Route path="dashboard" element={<DashboardPage />} />
                         {/* Videos */}
                         <Route
                             path="video/:videoId"
