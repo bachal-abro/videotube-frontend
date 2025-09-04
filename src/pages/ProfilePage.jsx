@@ -1023,7 +1023,7 @@ export default function ChannelPage() {
                                         placeholder="Tell viewers about your channel"
                                     />
                                     <p className="text-xs text-muted-foreground">
-                                        {editDetailsState.description.length}
+                                        {editDetailsState?.description?.length}
                                         /1000 characters
                                     </p>
                                 </div>
