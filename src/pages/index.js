@@ -3,7 +3,8 @@ import Subscriptions from "./Subscriptions.jsx";
 import History from "./History.jsx";
 import Profile from "./Profile.jsx";
 import Settings from "./Settings.jsx";
-import Login from "./Login.jsx";
+import LoginPage from "./LoginPage.jsx";
+import SignupPage from "./SignupPage.jsx";
 import LikedVideos from "./LikedVideos.jsx";
 import VideoView from "./VideoView.jsx";
 import WatchLaterPage from "./WatchLaterPage.jsx";
@@ -18,7 +19,8 @@ export {
     History,
     Profile,
     Settings,
-    Login,
+    LoginPage,
+    SignupPage,
     LikedVideos,
     VideoView,
     WatchLaterPage,

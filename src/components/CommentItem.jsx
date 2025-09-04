@@ -169,7 +169,7 @@ function CommentItem({ comment, hasParent, refetch }) {
             {/* Avatar */}
             <Avatar className="h-8 w-8 flex-shrink-0">
                 <AvatarImage
-                    src={comment?.owner?.avatar || "/placeholder.svg"}
+                    src={comment?.owner?.avatar}
                     alt={comment?.owner?.displayName}
                 />
                 <AvatarFallback>
@@ -228,7 +228,10 @@ function CommentItem({ comment, hasParent, refetch }) {
                                 src={comment?.owner?.avatar}
                                 alt={comment?.owner?.displayName}
                             />
-                            <AvatarFallback>U</AvatarFallback>
+                                                                    <AvatarFallback>
+                                            {user?.displayName?.charAt(0) ||
+                                                user?.username?.charAt(0)}
+                                        </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 space-y-2">
                             <Textarea

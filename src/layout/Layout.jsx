@@ -13,6 +13,7 @@ import Header from "./Header";
 import { useSelector } from "react-redux";
 
 export default function Layout() {
+    const { user } = useSelector((store) => store.auth);
     const { sidebarOpen } = useSelector((store) => store.system);
     const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate()
@@ -31,7 +32,7 @@ export default function Layout() {
                 {/* Main content - automatically takes full width when sidebar is hidden */}
                 <main
                     className={`flex-1 transition-all duration-100 ${
-                        sidebarOpen ? "md:ml-64" : ""
+                        sidebarOpen && user ? "md:ml-64" : ""
                     }`}
                 >
                     <Outlet />

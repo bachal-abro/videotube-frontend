@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import {
     Home,
     VideoView,
+    LoginPage,
     Subscriptions,
     Profile,
     History,
@@ -12,10 +13,10 @@ import {
     PlaylistDetailPage,
     UploadPage,
     YourVideosPage,
+    SignupPage,
 } from "./pages/index";
 
 import Layout from "./layout/Layout";
-import Login from "./pages/Login";
 import RequireAuth from "./features/auth/RequireAuth";
 import ProfileHome from "./components/ProfileHome";
 import usePersistLogin from "./hooks/usePersistLogin";
@@ -34,7 +35,9 @@ function App() {
             <Routes>
                 <Route path="/" element={<Layout />}>
                     {/* public routes */}
-                    <Route path="login" element={<Login />} />
+                    <Route path="login" element={<LoginPage />} />
+                    <Route path="signup" element={<SignupPage />} />
+                    
                     {/* protected routes */}
                     <Route element={<RequireAuth />}>
                         <Route index element={<Home />} />
@@ -57,7 +60,7 @@ function App() {
                             element={<PlaylistDetailPage />}
                         />
                         <Route path="settings" element={<Settings />} />
-                        <Route path="logout" element={<Login />} />
+                        <Route path="logout" element={<LoginPage />} />
                         <Route path="upload" element={<UploadPage />} />
                         <Route
                             path="your-videos"

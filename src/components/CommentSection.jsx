@@ -94,8 +94,6 @@ const CommentSection = () => {
             }).unwrap();
             setCommentText("");
             setPage(1); // ← reset page first
-            setPage(1);
-            await new Promise((r) => setTimeout(r, 0)); // microtask tick
             await refetch();
             toast({
                 title: "Comment posted!",
@@ -123,7 +121,10 @@ const CommentSection = () => {
             <div className="flex gap-3">
                 <Avatar className="h-8 w-8">
                     <AvatarImage src={user?.avatar} alt={user?.username} />
-                    <AvatarFallback>YA</AvatarFallback>
+                                                            <AvatarFallback>
+                                            {user?.displayName?.charAt(0) ||
+                                                user?.username?.charAt(0)}
+                                        </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 space-y-2">
                     <Textarea

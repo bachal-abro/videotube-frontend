@@ -9,6 +9,13 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 body: { ...credentials },
             }),
         }),
+        register: builder.mutation({
+            query: (credentials) => ({
+                url: "users/register",
+                method: "POST",
+                body: { ...credentials },
+            }),
+        }),
         refreshAccessToken: builder.mutation({
             query: () => ({
                 url: "/users/refresh-token",
@@ -32,6 +39,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
 
 export const {
     useLoginMutation,
+    useRegisterMutation,
     useRefreshAccessTokenMutation,
     useGetUserMutation,
     useLogoutMutation,

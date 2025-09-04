@@ -72,6 +72,7 @@ const settingsItems = [
 ];
 
 export function Sidebar() {
+    const { user } = useSelector((store) => store.auth);
     const dispatch = useDispatch();
     const location = useLocation();
     const navigate = useNavigate();
@@ -145,85 +146,93 @@ export function Sidebar() {
     }
 
     return (
-        <>
-            {/* Mobile overlay - only show on mobile when sidebar is open */}
-            <div
-                className="fixed inset-0 bg-black/50 z-30 lg:hidden"
-                onClick={onClose}
-            />
+        user && (
+            <>
+                {/* Mobile overlay - only show on mobile when sidebar is open */}
+                <div
+                    className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+                    onClick={onClose}
+                />
 
-            {/* Sidebar */}
-            <aside className="fixed bg-background left-0 top-16 h-[calc(100vh-4rem)] w-64 border-r z-40 overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-                <div className="p-4 space-y-6 bg-background">
-                    {/* Main Navigation */}
-                    <div className="space-y-1">
-                        {navigationItems.map((item) => (
+                {/* Sidebar */}
+                <aside className="fixed bg-background left-0 top-16 h-[calc(100vh-4rem)] w-64 border-r z-40 overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+                    <div className="p-4 space-y-6 bg-background">
+                        {/* Main Navigation */}
+                        <div className="space-y-1">
+                            {navigationItems.map((item) => (
+                                <SidebarItem
+                                    key={item.path}
+                                    icon={item.icon}
+                                    label={item.label}
+                                    path={item.path}
+                                    isActive={location.pathname === item.path}
+                                />
+                            ))}
+                        </div>
+
+                        <hr className="border-border" />
+
+                        {/* Subscriptions */}
+                        <div className="space-y-1">
                             <SidebarItem
-                                key={item.path}
-                                icon={item.icon}
-                                label={item.label}
-                                path={item.path}
-                                isActive={location.pathname === item.path}
+                                icon={
+                                    subscriptionsExpanded
+                                        ? ChevronDown
+                                        : ChevronRight
+                                }
+                                label="Subscriptions"
+                                onClick={() =>
+                                    setSubscriptionsExpanded(
+                                        !subscriptionsExpanded
+                                    )
+                                }
                             />
-                        ))}
+
+                            {subscriptionsExpanded && (
+                                <div className="space-y-1 ml-2">
+                                    {subscriptions.map((subscription) => (
+                                        <SubscriptionItem
+                                            key={subscription.name}
+                                            name={subscription.name}
+                                            avatar={subscription.avatar}
+                                            subscribers={
+                                                subscription.subscribers
+                                            }
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <hr className="border-border" />
+
+                        {/* Settings */}
+                        <div className="space-y-1">
+                            {settingsItems.map((item) => (
+                                <SidebarItem
+                                    key={item.path}
+                                    icon={item.icon}
+                                    label={item.label}
+                                    path={item.path}
+                                    isActive={location.pathname === item.path}
+                                />
+                            ))}
+                        </div>
+
+                        {/* Footer info */}
+                        <div className="px-3 pt-4 text-xs text-muted-foreground space-y-2">
+                            <p>About Press Copyright</p>
+                            <p>Contact us Creators</p>
+                            <p>Advertise Developers</p>
+                            <p className="pt-2">
+                                Terms Privacy Policy & Safety
+                            </p>
+                            <p>How VideoTube works</p>
+                            <p className="pt-2">© 2024 VideoTube</p>
+                        </div>
                     </div>
-
-                    <hr className="border-border" />
-
-                    {/* Subscriptions */}
-                    <div className="space-y-1">
-                        <SidebarItem
-                            icon={
-                                subscriptionsExpanded
-                                    ? ChevronDown
-                                    : ChevronRight
-                            }
-                            label="Subscriptions"
-                            onClick={() =>
-                                setSubscriptionsExpanded(!subscriptionsExpanded)
-                            }
-                        />
-
-                        {subscriptionsExpanded && (
-                            <div className="space-y-1 ml-2">
-                                {subscriptions.map((subscription) => (
-                                    <SubscriptionItem
-                                        key={subscription.name}
-                                        name={subscription.name}
-                                        avatar={subscription.avatar}
-                                        subscribers={subscription.subscribers}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    <hr className="border-border" />
-
-                    {/* Settings */}
-                    <div className="space-y-1">
-                        {settingsItems.map((item) => (
-                            <SidebarItem
-                                key={item.path}
-                                icon={item.icon}
-                                label={item.label}
-                                path={item.path}
-                                isActive={location.pathname === item.path}
-                            />
-                        ))}
-                    </div>
-
-                    {/* Footer info */}
-                    <div className="px-3 pt-4 text-xs text-muted-foreground space-y-2">
-                        <p>About Press Copyright</p>
-                        <p>Contact us Creators</p>
-                        <p>Advertise Developers</p>
-                        <p className="pt-2">Terms Privacy Policy & Safety</p>
-                        <p>How VideoTube works</p>
-                        <p className="pt-2">© 2024 VideoTube</p>
-                    </div>
-                </div>
-            </aside>
-        </>
+                </aside>
+            </>
+        )
     );
 }

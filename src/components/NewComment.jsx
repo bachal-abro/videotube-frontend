@@ -42,7 +42,7 @@ const NewComment = () => {
                 likes: 0,
                 isLiked: false,
             };
-            
+
             dispatch(setCurrentVideoComments([...commentsList, newObj]));
             setContent(""); // clear input
         } catch (isError) {
@@ -58,11 +58,13 @@ const NewComment = () => {
         >
             <div className="flex flex-col gap-4 w-full mb-2">
                 <div className="flex gap-2">
-                    <img
-                        className="h-10 w-10 rounded-full sm:block"
-                        src={user?.avatar}
-                        alt=""
-                    />
+                    <Avatar className="h-8 w-8">
+                        <AvatarImage src={user?.avatar} alt="User Avatar" />
+                        <AvatarFallback>
+                            {user?.displayName?.charAt(0) ||
+                                user?.username?.charAt(0)}
+                        </AvatarFallback>
+                    </Avatar>
                     <label
                         htmlFor="content"
                         className="flex flex-col text-sm font-medium text-gray-900 dark:text-white"
