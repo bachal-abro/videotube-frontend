@@ -8,6 +8,11 @@ export const videosApiSlice = apiSlice.injectEndpoints({
         getAllVideosOfUser: builder.query({
             query: (userId) => `/videos/user/${userId}`,
         }),
+
+        getAllVideosOfAuthUser: builder.query({
+            query: () => `/videos/auth/user`,
+        }),
+
         getVideosFromSubscriptions: builder.query({
             query: () => "/videos/subscriptions",
         }),
@@ -40,6 +45,7 @@ export const videosApiSlice = apiSlice.injectEndpoints({
 export const {
     useGetAllVideosQuery,
     useGetAllVideosOfUserQuery,
+    useGetAllVideosOfAuthUserQuery,
     useGetVideosFromSubscriptionsQuery,
     useGetVideoByIdQuery,
     useUploadVideoMutation,

@@ -25,12 +25,10 @@ import {
 import { useToast } from "../hooks/use-toast";
 import {
     useDeleteVideoMutation,
-    useGetAllVideosOfUserQuery,
+    useGetAllVideosOfAuthUserQuery,
     useToggleVisibilityStatusMutation,
 } from "../features/videos/videosApiSlice";
 import { timeAgo, secondsToDuration } from "../utils/timeFormats";
-import { useSelector } from "react-redux";
-
 export default function YourVideosPage() {
     const navigate = useNavigate();
     const { toast } = useToast();
@@ -38,7 +36,7 @@ export default function YourVideosPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [filterStatus, setFilterStatus] = useState("all"); // all, public, unlisted, private
     const { data, isSuccess, isLoading, refetch } =
-        useGetAllVideosOfUserQuery();
+        useGetAllVideosOfAuthUserQuery();
     const [toggleVisibilityStatus] = useToggleVisibilityStatusMutation();
     const [deleteVideo] = useDeleteVideoMutation();
 
@@ -231,7 +229,9 @@ export default function YourVideosPage() {
                                                     className="w-full h-full object-cover"
                                                 />
                                                 <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1 py-0.5 rounded">
-                                                    {secondsToDuration(video.duration)}
+                                                    {secondsToDuration(
+                                                        video.duration
+                                                    )}
                                                 </div>
                                             </div>
 
