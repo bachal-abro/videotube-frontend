@@ -1,35 +1,25 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { Sidebar } from "../components/Sidebar";
-import { useState, useEffect } from "react";
-import { Button } from "../components/ui/button";
-import { ThemeToggle } from "../components/theme-toggle";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"; // Import Avatar components
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "../components/ui/popover";
+import { Sidebar } from "./Sidebar"; 
+import { useEffect } from "react";
 import Header from "./Header";
-import { useSelector } from "react-redux";
-
+import { useDispatch, useSelector } from "react-redux";
+import { setSmallScreenSidebar } from "../features/system/systemSlice";
 export default function Layout() {
     const { user } = useSelector((store) => store.auth);
     const { sidebarOpen } = useSelector((store) => store.system);
-    const [searchQuery, setSearchQuery] = useState("");
-    const navigate = useNavigate()
-    const handleSearch = (e) => {
-        e.preventDefault();
-        console.log("Searching for:", searchQuery);
-    };
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (window.innerWidth < 768) {
+            dispatch(setSmallScreenSidebar());
+        }
+    }, [dispatch]);
 
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
             <div className="flex flex-1">
-                {/* Sidebar */}
                 <Sidebar />
-
-                {/* Main content - automatically takes full width when sidebar is hidden */}
                 <main
                     className={`flex-1 transition-all duration-100 ${
                         sidebarOpen && user ? "md:ml-64" : ""

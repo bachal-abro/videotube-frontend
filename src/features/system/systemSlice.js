@@ -7,11 +7,13 @@ const systemSlice = createSlice({
     },
     reducers: {
         setSidebarOpen: (state, action) => {
-            state.sidebarOpen = !(state.sidebarOpen);
+            state.sidebarOpen = !state.sidebarOpen;
+        },
+        setSmallScreenSidebar: (state) => {
+            state.sidebarOpen = false;
         },
     },
 });
 
-export const { setSidebarOpen } =
-    systemSlice.actions;
+export const { setSidebarOpen, setSmallScreenSidebar } = systemSlice.actions;
 export default systemSlice.reducer;

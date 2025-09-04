@@ -1,29 +1,26 @@
 import { Routes, Route } from "react-router-dom";
 import {
-    Home,
-    VideoView,
+    HomePage,
     LoginPage,
-    Subscriptions,
-    Profile,
-    History,
+    SubscriptionsPage,
+    ProfilePage,
+    HistoryPage,
     WatchLaterPage,
-    LikedVideos,
-    Settings,
+    LikedVideosPage,
+    SettingsPage,
     PlaylistsPage,
     PlaylistDetailPage,
     UploadPage,
     YourVideosPage,
     SignupPage,
+    VideoDetailPage,
 } from "./pages/index";
 
 import Layout from "./layout/Layout";
 import RequireAuth from "./features/auth/RequireAuth";
-import ProfileHome from "./components/ProfileHome";
 import usePersistLogin from "./hooks/usePersistLogin";
-import LogoutButton from "./components/ui/LogoutButton";
-import VideoDetailPage from "./pages/VideoDetailPage";
-import { useState } from "react";
 import { Toaster } from "./components/ui/toast"; // Import Toaster
+import Subscriptions from "./pages/SubscriptionsPage";
 function App() {
     const persistLoaded = usePersistLogin();
     if (!persistLoaded) return <p>Loading...</p>; // or a spinner
@@ -37,29 +34,30 @@ function App() {
                     {/* public routes */}
                     <Route path="login" element={<LoginPage />} />
                     <Route path="signup" element={<SignupPage />} />
-                    
+
                     {/* protected routes */}
                     <Route element={<RequireAuth />}>
-                        <Route index element={<Home />} />
-                        <Route path=":username" element={<Profile />}>
-                            <Route element={<ProfileHome />} />
-                        </Route>
+                        <Route index element={<HomePage />} />
+                        <Route
+                            path=":username"
+                            element={<ProfilePage />}
+                        ></Route>
                         <Route
                             path="subscriptions"
-                            element={<Subscriptions />}
+                            element={<SubscriptionsPage />}
                         />
-                        <Route path="history" element={<History />} />
+                        <Route path="history" element={<HistoryPage />} />
                         <Route
                             path="watch-later"
                             element={<WatchLaterPage />}
                         />
-                        <Route path="liked" element={<LikedVideos />} />
+                        <Route path="liked" element={<LikedVideosPage />} />
                         <Route path="playlists" element={<PlaylistsPage />} />
                         <Route
                             path="playlist/:id"
                             element={<PlaylistDetailPage />}
                         />
-                        <Route path="settings" element={<Settings />} />
+                        <Route path="settings" element={<SettingsPage />} />
                         <Route path="logout" element={<LoginPage />} />
                         <Route path="upload" element={<UploadPage />} />
                         <Route

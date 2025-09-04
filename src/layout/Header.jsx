@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../components/ui/button";
-import { ThemeToggle } from "../components/theme-toggle";
 import { Input } from "../components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"; // Import Avatar components
 import {
@@ -23,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { setSidebarOpen } from "../features/system/systemSlice";
 import { useLogoutMutation } from "../features/auth/authApiSlice";
 import { logOut } from "../features/auth/authSlice";
+import { ThemeToggle } from "../components/theme-toggle";
 
 const Header = () => {
     const dispatch = useDispatch();
@@ -43,6 +43,8 @@ const Header = () => {
         dispatch(logOut());
         navigate("/login");
     };
+    const [profileOpen, setProfileOpen] = useState(false);
+    const [notificationsOpen, setNotificationsOpen] = useState(false);
 
     return (
         user && (
@@ -104,7 +106,10 @@ const Header = () => {
                             <Search className="h-5 w-5" />
                         </Button>
 
-                        <Popover>
+                        <Popover
+                            open={notificationsOpen}
+                            onOpenChange={setNotificationsOpen}
+                        >
                             <PopoverTrigger asChild>
                                 <Button
                                     variant="ghost"
@@ -121,15 +126,22 @@ const Header = () => {
                                 <h4 className="font-semibold mb-2">
                                     Notifications
                                 </h4>
-                                <p className="text-sm text-muted-foreground">
+
+                                {/* Example: If you later map notifications, you can close on click */}
+                                <button
+                                    onClick={() => setNotificationsOpen(false)}
+                                    className="text-sm text-muted-foreground w-full text-left"
+                                >
                                     No new notifications.
-                                </p>
-                                {/* You can add a list of notifications here */}
+                                </button>
                             </PopoverContent>
                         </Popover>
 
                         {/* Profile Popover */}
-                        <Popover>
+                        <Popover
+                            open={profileOpen}
+                            onOpenChange={setProfileOpen}
+                        >
                             <PopoverTrigger asChild>
                                 <Button
                                     variant="ghost"
@@ -176,7 +188,10 @@ const Header = () => {
                                     <Button
                                         variant="ghost"
                                         className="w-full justify-start text-sm"
-                                        onClick={handleRedirectToProfile}
+                                        onClick={() => {
+                                            handleRedirectToProfile();
+                                            setProfileOpen(false); // close popover
+                                        }}
                                     >
                                         <User className="mr-2 h-4 w-4" /> Your
                                         Channel
@@ -184,6 +199,7 @@ const Header = () => {
                                     <Button
                                         variant="ghost"
                                         className="w-full justify-start text-sm"
+                                        onClick={() => setProfileOpen(false)} // close popover
                                     >
                                         <Settings className="mr-2 h-4 w-4" />{" "}
                                         YouTube Studio
@@ -191,7 +207,10 @@ const Header = () => {
                                     <Button
                                         variant="ghost"
                                         className="w-full justify-start text-sm"
-                                        onClick={handleLogOut}
+                                        onClick={async () => {
+                                            await handleLogOut();
+                                            setProfileOpen(false); // close after logout
+                                        }}
                                     >
                                         <LogOut className="mr-2 h-4 w-4" /> Sign
                                         Out
@@ -199,7 +218,8 @@ const Header = () => {
                                 </div>
                             </PopoverContent>
                         </Popover>
-                        {/* <ThemeToggle /> */}
+
+                        <ThemeToggle />
                     </div>
                 </div>
             </header>

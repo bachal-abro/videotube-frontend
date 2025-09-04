@@ -1,140 +1,238 @@
-import React from "react";
-import { FaHome, FaHistory, FaSignOutAlt } from "react-icons/fa";
-import { MdSubscriptions } from "react-icons/md";
-import { GrChannel } from "react-icons/gr";
-import { AiFillLike } from "react-icons/ai";
-import { IoSettings } from "react-icons/io5";
-import { NavLink } from "react-router-dom";
-import LogoutButton from "../components/ui/LogoutButton";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+    Home,
+    TrendingUp,
+    Music,
+    Film,
+    Gamepad2,
+    Newspaper,
+    Trophy,
+    Lightbulb,
+    Shirt,
+    History,
+    Clock,
+    Tv,
+    ThumbsUp,
+    PlaySquare,
+    Settings,
+    HelpCircle,
+    Flag,
+    ChevronDown,
+    ChevronRight,
+    ListVideo,
+} from "lucide-react";
+import { cn } from "../lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { useDispatch, useSelector } from "react-redux";
+import { setSidebarOpen } from "../features/system/systemSlice";
 
-const Sidebar = () => {
-    return (
-        <div className="relative hidden sm:block bg-gray-900">
-            <div className="w-48 text-xl min-h-screen"></div>
-            <ul className="w-48 text-xl fixed top-16 left-0">
-                <li>
-                    <NavLink
-                        to="/"
-                        className={({ isActive }) =>
-                            `flex items-center gap-2 px-4 py-3 ${
-                                isActive
-                                    ? "border-s-[3px] border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-50"
-                                    : "border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-                            }`
-                        }
-                    >
-                        <FaHome />
-                        <span className="text-sm font-medium"> Home </span>
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink
-                        to={"/subscriptions"}
-                        className={({ isActive }) =>
-                            `flex items-center gap-2 px-4 py-3 ${
-                                isActive
-                                    ? "border-s-[3px] border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-50"
-                                    : " border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-                            }`
-                        }
-                    >
-                        <MdSubscriptions />
-                        <span className="text-sm font-medium">
-                            {" "}
-                            Subscriptions{" "}
-                        </span>
-                    </NavLink>
-                </li>
+const navigationItems = [
+    { icon: Home, label: "Home", path: "/" },
+    { icon: Tv, label: "Subscriptions", path: "/subscriptions" },
+    { icon: History, label: "History", path: "/history" },
+    { icon: Clock, label: "Watch Later", path: "/watch-later" },
+    { icon: ThumbsUp, label: "Liked Videos", path: "/liked" },
+    { icon: ListVideo, label: "Playlists", path: "/playlists" },
+    { icon: PlaySquare, label: "Your Videos", path: "/your-videos" },
+];
 
-                <li>
-                    <NavLink
-                        to="/@username"
-                        className={({ isActive }) =>
-                            `flex items-center gap-2 px-4 py-3 ${
-                                isActive
-                                    ? "border-s-[3px] border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-50"
-                                    : " border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-                            }`
-                        }
-                    >
-                        <GrChannel />
+const subscriptions = [
+    {
+        name: "Code Masters",
+        avatar: "https://placehold.co/32x32/orange/white?text=CM",
+        subscribers: "1.2M",
+    },
+    {
+        name: "React Tutorials",
+        avatar: "https://placehold.co/32x32/3b82f6/white?text=RT",
+        subscribers: "856K",
+    },
+    {
+        name: "Tech Insights",
+        avatar: "https://placehold.co/32x32/6366f1/white?text=TI",
+        subscribers: "3.4M",
+    },
+    {
+        name: "Web Design Pro",
+        avatar: "https://placehold.co/32x32/06b6d4/white?text=WD",
+        subscribers: "427K",
+    },
+    {
+        name: "JS Mastery",
+        avatar: "https://placehold.co/32x32/f59e0b/white?text=JS",
+        subscribers: "982K",
+    },
+];
 
-                        <span className="text-sm font-medium">
-                            {" "}
-                            Your channel{" "}
-                        </span>
-                    </NavLink>
-                </li>
+const settingsItems = [
+    { icon: Settings, label: "Settings", path: "/settings" },
+    { icon: HelpCircle, label: "Help", path: "/help" },
+    { icon: Flag, label: "Send Feedback", path: "/feedback" },
+];
 
-                <li>
-                    <NavLink
-                        to={"/history"}
-                        className={({ isActive }) =>
-                            `flex items-center gap-2 px-4 py-3 ${
-                                isActive
-                                    ? "border-s-[3px] border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-50"
-                                    : " border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-                            }`
-                        }
-                    >
-                        <FaHistory />
-                        <span className="text-sm font-medium"> History </span>
-                    </NavLink>
-                </li>
+export function Sidebar() {
+    const { user } = useSelector((store) => store.auth);
+    const dispatch = useDispatch();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const [subscriptionsExpanded, setSubscriptionsExpanded] = useState(true);
+    const { sidebarOpen } = useSelector((store) => store.system);
 
-                <li>
-                    <NavLink
-                        to={"/liked"}
-                        className={({ isActive }) =>
-                            `flex items-center gap-2 px-4 py-3 ${
-                                isActive
-                                    ? "border-s-[3px] border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-50"
-                                    : " border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-                            }`
-                        }
-                    >
-                        <AiFillLike />
+    const onClose = () => {
+        if (sidebarOpen) {
+            dispatch(setSidebarOpen());
+        }
+    };
 
-                        <span className="text-sm font-medium">
-                            {" "}
-                            Liked videos{" "}
-                        </span>
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink
-                        to={"/settings"}
-                        className={({ isActive }) =>
-                            `flex items-center gap-2 px-4 py-3 ${
-                                isActive
-                                    ? "border-s-[3px] border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-50"
-                                    : " border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-                            }`
-                        }
-                    >
-                        <IoSettings />
+    const handleNavigation = (path) => {
+        navigate(path);
+        if (window.innerWidth < 1024) {
+            onClose();
+        }
+    };
 
-                        <span className="text-sm font-medium"> Settings </span>
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink
-                        to={"/logout"}
-                        className={({ isActive }) =>
-                            `flex items-center gap-2 px-4 py-3 ${
-                                isActive
-                                    ? "border-s-[3px] border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-50"
-                                    : " border-transparent text-gray-500 hover:border-gray-100 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-                            }`
-                        }
-                    >
-                        <FaSignOutAlt />
-                        <LogoutButton />
-                    </NavLink>
-                </li>
-            </ul>
-        </div>
+    const SidebarItem = ({
+        icon: Icon,
+        label,
+        path,
+        isActive,
+        onClick,
+        children,
+    }) => (
+        <button
+            onClick={onClick || (() => handleNavigation(path))}
+            className={cn(
+                "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground group",
+                isActive && "bg-accent text-accent-foreground shadow-sm",
+                !isActive && "text-muted-foreground hover:text-foreground"
+            )}
+        >
+            <Icon className="h-5 w-5 flex-shrink-0" />
+            <span className="truncate">{label}</span>
+            {children}
+        </button>
     );
-};
 
-export default Sidebar;
+    const SubscriptionItem = ({ name, avatar, subscribers }) => (
+        <button
+            onClick={() =>
+                handleNavigation(
+                    `/channel/${name.toLowerCase().replace(/\s+/g, "-")}`
+                )
+            }
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 hover:bg-accent hover:text-accent-foreground group"
+        >
+            <Avatar className="h-6 w-6 flex-shrink-0">
+                <AvatarImage src={avatar || "/placeholder.svg"} alt={name} />
+                <AvatarFallback className="text-xs">
+                    {name.charAt(0)}
+                </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 text-left truncate">
+                <p className="font-medium text-foreground/90 group-hover:text-foreground truncate">
+                    {name}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                    {subscribers} subscribers
+                </p>
+            </div>
+        </button>
+    );
+
+    // Don't render sidebar if it's closed
+    if (!sidebarOpen) {
+        return null;
+    }
+
+    return (
+        user && (
+            <>
+                {/* Mobile overlay - only show on mobile when sidebar is open */}
+                <div
+                    className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+                    onClick={onClose}
+                />
+
+                {/* Sidebar */}
+                <aside className="fixed bg-background left-0 top-16 h-[calc(100vh-4rem)] w-64 border-r z-40 overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+                    <div className="p-4 space-y-6 bg-background">
+                        {/* Main Navigation */}
+                        <div className="space-y-1">
+                            {navigationItems.map((item) => (
+                                <SidebarItem
+                                    key={item.path}
+                                    icon={item.icon}
+                                    label={item.label}
+                                    path={item.path}
+                                    isActive={location.pathname === item.path}
+                                />
+                            ))}
+                        </div>
+
+                        <hr className="border-border" />
+
+                        {/* Subscriptions */}
+                        <div className="space-y-1">
+                            <SidebarItem
+                                icon={
+                                    subscriptionsExpanded
+                                        ? ChevronDown
+                                        : ChevronRight
+                                }
+                                label="Subscriptions"
+                                onClick={() =>
+                                    setSubscriptionsExpanded(
+                                        !subscriptionsExpanded
+                                    )
+                                }
+                            />
+
+                            {subscriptionsExpanded && (
+                                <div className="space-y-1 ml-2">
+                                    {subscriptions.map((subscription) => (
+                                        <SubscriptionItem
+                                            key={subscription.name}
+                                            name={subscription.name}
+                                            avatar={subscription.avatar}
+                                            subscribers={
+                                                subscription.subscribers
+                                            }
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <hr className="border-border" />
+
+                        {/* Settings */}
+                        <div className="space-y-1">
+                            {settingsItems.map((item) => (
+                                <SidebarItem
+                                    key={item.path}
+                                    icon={item.icon}
+                                    label={item.label}
+                                    path={item.path}
+                                    isActive={location.pathname === item.path}
+                                />
+                            ))}
+                        </div>
+
+                        {/* Footer info */}
+                        <div className="px-3 pt-4 text-xs text-muted-foreground space-y-2">
+                            <p>About Press Copyright</p>
+                            <p>Contact us Creators</p>
+                            <p>Advertise Developers</p>
+                            <p className="pt-2">
+                                Terms Privacy Policy & Safety
+                            </p>
+                            <p>How VideoTube works</p>
+                            <p className="pt-2">© 2024 VideoTube</p>
+                        </div>
+                    </div>
+                </aside>
+            </>
+        )
+    );
+}

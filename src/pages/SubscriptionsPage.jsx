@@ -1,23 +1,18 @@
 import React, { useEffect } from "react";
-import HomeFeed from "../components/HomeFeed";
 import { useDispatch, useSelector } from "react-redux";
 import { VideoCard } from "../components/video-card";
-import { setVideoFeed } from "../features/videos/videoSlice";
-import { useGetAllVideosQuery } from "../features/videos/videosApiSlice";
-import { videosData } from "../data/videos";
-import { categories } from "../data/categories"; // Import categories
-import { Button } from "../components/ui/button"; // Import Button
+import { setSubscriptionFeed } from "../features/videos/videoSlice";
+import { useGetVideosFromSubscriptionsQuery } from "../features/videos/videosApiSlice";
 import { timeAgo } from "../utils/timeFormats";
 
-const Home = () => {
-    const { videoFeed } = useSelector((store) => store.video);
+const Subscriptions = () => {
+    const { subscriptionFeed } = useSelector((store) => store.video);
     const dispatch = useDispatch();
     const { data, isLoading, isSuccess, isError, error } =
-        useGetAllVideosQuery();
+        useGetVideosFromSubscriptionsQuery();
     useEffect(() => {
-        console.log(data?.data);
         if (isSuccess && data?.data) {
-            dispatch(setVideoFeed(data.data));
+            dispatch(setSubscriptionFeed(data.data));
         }
     }, [isSuccess, data, dispatch]);
 
@@ -25,22 +20,10 @@ const Home = () => {
         return <p>"Loading..."</p>;
     } else if (isSuccess) {
         return (
-            <div className="container mx-auto py-10 px-4 lg:px-6">
-                <div className="mb-8 flex overflow-x-auto pb-4 scrollbar-hide max">
-                    <div className="flex gap-3 whitespace-nowrap w-0">
-                        {categories.map((category) => (
-                            <Button
-                                key={category}
-                                variant="secondary"
-                                className="rounded-full px-4 py-2 text-sm flex-shrink-0"
-                            >
-                                {category}
-                            </Button>
-                        ))}
-                    </div>
-                </div>
+            <div className="container mx-auto py-6 px-4 lg:px-6">
+                <h1 className="text-2xl font-bold mb-6">Latest</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {videoFeed.map((video) => (
+                    {subscriptionFeed.map((video) => (
                         <VideoCard
                             key={video._id}
                             id={video._id}
@@ -62,4 +45,4 @@ const Home = () => {
     }
 };
 
-export default Home;
+export default Subscriptions;

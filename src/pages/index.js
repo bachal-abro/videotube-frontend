@@ -1,31 +1,30 @@
-import Home from "./Home.jsx";
-import Subscriptions from "./Subscriptions.jsx";
-import History from "./History.jsx";
-import Profile from "./Profile.jsx";
-import Settings from "./Settings.jsx";
+import HomePage from "./HomePage.jsx";
+import SubscriptionsPage from "./SubscriptionsPage.jsx";
+import HistoryPage from "./HistoryPage.jsx";
+import ProfilePage from "./ProfilePage.jsx";
+import SettingsPage from "./SettingsPage.jsx";
 import LoginPage from "./LoginPage.jsx";
 import SignupPage from "./SignupPage.jsx";
-import LikedVideos from "./LikedVideos.jsx";
-import VideoView from "./VideoView.jsx";
 import WatchLaterPage from "./WatchLaterPage.jsx";
 import PlaylistsPage from "./PlaylistsPage";
 import PlaylistDetailPage from "./PlaylistDetailPage.jsx";
 import UploadPage from "./UploadPage.jsx";
 import YourVideosPage from "./YourVideosPage.jsx";
-
+import LikedVideosPage from "./LikedVideosPage.jsx";
+import VideoDetailPage from "./VideoDetailPage.jsx";
 export {
-    Home,
-    Subscriptions,
-    History,
-    Profile,
-    Settings,
+    HomePage,
+    SubscriptionsPage,
+    HistoryPage,
+    ProfilePage,
+    SettingsPage,
     LoginPage,
     SignupPage,
-    LikedVideos,
-    VideoView,
+    LikedVideosPage,
     WatchLaterPage,
     PlaylistsPage,
     PlaylistDetailPage,
     UploadPage,
     YourVideosPage,
+    VideoDetailPage,
 };
