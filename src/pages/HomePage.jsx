@@ -4,7 +4,7 @@ import { VideoCard } from "../components/VideoCard";
 import { setVideoFeed } from "../features/videos/videoSlice";
 import { useGetAllVideosQuery } from "../features/videos/videosApiSlice";
 import { categories } from "../data/categories"; // Import categories
-import { Button } from "../components/ui/Button"; // Import Button
+import { Button } from "../components/ui/Button";
 
 const HomePage = () => {
     const { videoFeed } = useSelector((store) => store.video);
