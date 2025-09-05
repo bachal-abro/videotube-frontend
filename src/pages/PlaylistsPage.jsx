@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { PlaylistCard } from "../components/PlaylistCard";
 import { CreatePlaylistDialog } from "../components/CreatePlaylistDialog";
-import { Input } from "../components/ui/input"
+import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Search, Plus, X } from "lucide-react";
 import {

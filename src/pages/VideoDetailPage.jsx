@@ -310,33 +310,33 @@ export default function VideoDetailPage() {
                                         {video.owner.subscribers} subscribers
                                     </p>
                                 </div>
-                                                           {/* Subscribe Button Section - Updated */}
-                            <Button
-                                variant={
-                                    video.owner.isSubscribed
-                                        ? "secondary"
-                                        : "youtube-subscribe"
-                                }
-                                size="sm"
-                                className={cn(
-                                    "ml-2 transition-all duration-200",
-                                    video.owner.isSubscribed &&
-                                        "bg-gray-200 hover:bg-gray-300 text-gray-700 border"
-                                )}
-                                onClick={handleToggleSubscribe}
-                            >
-                                {video.owner.isSubscribed ? (
-                                    <>
-                                        <Check className="mr-2 h-4 w-4" />
-                                        Subscribed
-                                    </>
-                                ) : (
-                                    <>
-                                        <Bell className="mr-2 h-4 w-4" />
-                                        Subscribe
-                                    </>
-                                )}
-                            </Button>
+                                {/* Subscribe Button Section - Updated */}
+                                <Button
+                                    variant={
+                                        video.owner.isSubscribed
+                                            ? "secondary"
+                                            : "youtube-subscribe"
+                                    }
+                                    size="sm"
+                                    className={cn(
+                                        "ml-2 transition-all duration-200",
+                                        video.owner.isSubscribed &&
+                                            "bg-gray-200 hover:bg-gray-300 text-gray-700 border"
+                                    )}
+                                    onClick={handleToggleSubscribe}
+                                >
+                                    {video.owner.isSubscribed ? (
+                                        <>
+                                            <Check className="mr-2 h-4 w-4" />
+                                            Subscribed
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Bell className="mr-2 h-4 w-4" />
+                                            Subscribe
+                                        </>
+                                    )}
+                                </Button>
                             </div>
 
                             <div className="flex flex-wrap gap-2">

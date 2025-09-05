@@ -10,7 +10,7 @@ import {
     User,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input"
+import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import {
     Card,
@@ -23,9 +23,7 @@ import { Alert, AlertDescription } from "../components/ui/alert";
 import { Separator } from "../components/ui/separator";
 import { useToast } from "../hooks/use-toast";
 import { useSelector, useDispatch } from "react-redux";
-import {
-    useLoginMutation,
-} from "../features/auth/authApiSlice";
+import { useLoginMutation } from "../features/auth/authApiSlice";
 import { logOut, setCredentials } from "../features/auth/authSlice";
 
 export default function LoginPage() {

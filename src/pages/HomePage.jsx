@@ -6,7 +6,7 @@ import { useGetAllVideosQuery } from "../features/videos/videosApiSlice";
 import { categories } from "../data/categories"; // Import categories
 import { Button } from "../components/ui/button"; // Import Button
 
-const HomePage= () => {
+const HomePage = () => {
     const { videoFeed } = useSelector((store) => store.video);
     const dispatch = useDispatch();
     const { data, isLoading, isSuccess, isError, error } =

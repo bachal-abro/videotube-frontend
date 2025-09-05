@@ -54,8 +54,7 @@ export default function PlaylistDetailPage() {
     const { data, isSuccess, isLoading, refetch } = useGetPlaylistQuery({
         playlistId: id,
     });
-    const [removeVideoFromPlaylist] =
-        useRemoveVideoFromPlaylistMutation();
+    const [removeVideoFromPlaylist] = useRemoveVideoFromPlaylistMutation();
 
     const [deletePlaylist] = useDeletePlaylistMutation();
     const [editPlaylist] = useEditPlaylistMutation();

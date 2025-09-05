@@ -41,7 +41,6 @@ import { Label } from "../components/ui/label";
 import { Tabs } from "../components/ui/tabs";
 import { VideoCard } from "../components/video-card";
 import { PlaylistCard } from "../components/PlaylistCard";
-import { videosData as sampleVideos } from "../data/videos";
 import { useToast } from "../hooks/use-toast";
 import { useGetUserPlaylistsQuery } from "../features/playlist/playlistsApiSlice";
 import { useGetAllVideosOfUserQuery } from "../features/videos/videosApiSlice";
