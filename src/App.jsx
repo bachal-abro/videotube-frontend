@@ -20,7 +20,7 @@ import {
 import Layout from "./layout/Layout";
 import RequireAuth from "./features/auth/RequireAuth";
 import usePersistLogin from "./hooks/usePersistLogin";
-import { Toaster } from "./components/ui/Toast"; // Import Toaster
+import { Toaster } from "./components/Toast"; // Import Toaster
 function App() {
     const persistLoaded = usePersistLogin();
     if (!persistLoaded) return <p>Loading...</p>; // or a spinner
