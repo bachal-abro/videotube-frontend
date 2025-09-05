@@ -8,7 +8,7 @@ export default defineConfig({
   server:{
     proxy:{
       '/api':'http://localhost:8000',
-      '/users':'http://localhost:8000/api/v1/users'
+      // '/users':'http://localhost:8000/api/v1/users'
     }
   }
 })

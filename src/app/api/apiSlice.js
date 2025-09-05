@@ -1,8 +1,16 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { setCredentials, logOut } from "../../features/auth/authSlice";
 
+const VITE_ENV_MODE = import.meta.env.VITE_ENV_MODE;
+const VITE_API_URL = import.meta.env.VITE_API_URL;
+const VITE_DEV_URL = import.meta.env.VITE_DEV_URL;
+const baseURL =
+    VITE_ENV_MODE == "DEV"
+        ? `${VITE_DEV_URL}` // during development, requests go to proxy
+        : `${VITE_API_URL}`; // production backend
+
 const baseQuery = fetchBaseQuery({
-    baseUrl: "http://localhost:8000/api/v1", // adjust as needed
+    baseUrl: `${baseURL}/api/v1`, // adjust as needed
     credentials: "include", // ensure cookies (for refresh token) are sent
     prepareHeaders: (headers, { getState }) => {
         const token = getState().auth.token;
