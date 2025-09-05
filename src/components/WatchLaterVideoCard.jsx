@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 
 import { cn } from "../lib/utils";
-import { Button } from "./ui/button";
+import { Button } from "./ui/Button";
 
 export function WatchLaterVideoCard({
     id,

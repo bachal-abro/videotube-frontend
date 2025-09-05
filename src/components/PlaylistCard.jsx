@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { MoreVertical, Play, Trash2 } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "./ui/Button";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "./ui/DropdownMenu";
 
 export function PlaylistCard({ playlist, onDelete }) {
     const navigate = useNavigate();

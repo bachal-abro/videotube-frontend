@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react"; // Changed from MoreVertical to X for direct removal
 
 import { cn } from "../lib/utils";
-import { Button } from "./ui/button";
+import { Button } from "./ui/Button";
 
 export function HistoryVideoCard({
     id,

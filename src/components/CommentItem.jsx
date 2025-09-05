@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
 import { ThumbsUp, ThumbsDown, Send, ReplyIcon } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Button } from "./ui/button";
-import { Textarea } from "./ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/Avatar";
+import { Button } from "./ui/Button";
+import { Textarea } from "./ui/Textarea";
 import { cn } from "../lib/utils"; // Ensure cn utility is available
 import { timeAgo } from "../utils/timeFormats";
 import { useCreateVideoCommentMutation } from "../features/comments/videoCommentsApiSlice";

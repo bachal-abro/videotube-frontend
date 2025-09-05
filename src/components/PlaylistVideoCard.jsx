@@ -10,13 +10,13 @@ import {
 import { timeAgo, secondsToDuration } from "../utils/timeFormats";
 
 import { cn } from "../lib/utils";
-import { Button } from "./ui/button";
+import { Button } from "./ui/Button";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "./ui/DropdownMenu";
 
 export function PlaylistVideoCard({
     video,

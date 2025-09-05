@@ -12,8 +12,8 @@ import {
     X,
 } from "lucide-react";
 
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/Input";
 import { PlaylistVideoCard } from "../components/PlaylistVideoCard";
 import { AddToPlaylistDialog } from "../components/AddToPlaylistDialog";
 import { videosData } from "../data/videos";
@@ -22,7 +22,7 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu";
+} from "../components/ui/DropdownMenu";
 import {
     Dialog,
     DialogContent,
@@ -30,8 +30,8 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from "../components/ui/dialog";
-import { Label } from "../components/ui/label";
+} from "../components/ui/Dialog";
+import { Label } from "../components/ui/Label";
 import { useToast } from "../hooks/use-toast";
 import {
     useDeletePlaylistMutation,

@@ -15,16 +15,16 @@ import {
 } from "lucide-react";
 
 import { cn } from "../lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { Button } from "../components/ui/button";
-import { VideoCard } from "../components/video-card";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/Avatar";
+import { Button } from "../components/ui/Button";
+import { VideoCard } from "../components/VideoCard";
 import { AddToPlaylistDialog } from "../components/AddToPlaylistDialog";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu";
+} from "../components/ui/DropdownMenu";
 import { useToast } from "../hooks/use-toast"; // Import useToast
 import { videosData } from "../data/videos";
 import { useDispatch, useSelector } from "react-redux";

@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"; // Import Avatar components
+import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/Input";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/Avatar"; // Import Avatar components
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "../components/ui/popover";
+} from "../components/ui/Popover";
 import {
     Menu,
     Search,
@@ -22,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { setSidebarOpen } from "../features/system/systemSlice";
 import { useLogoutMutation } from "../features/auth/authApiSlice";
 import { logOut } from "../features/auth/authSlice";
-import { ThemeToggle } from "../components/theme-toggle";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 const Header = () => {
     const dispatch = useDispatch();

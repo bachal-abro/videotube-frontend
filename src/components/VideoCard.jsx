@@ -5,7 +5,7 @@ import { Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { cn } from "../lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/Avatar";
 import { timeAgo, secondsToDuration } from "../utils/timeFormats";
 
 export function VideoCard({

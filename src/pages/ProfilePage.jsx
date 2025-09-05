@@ -17,18 +17,18 @@ import {
     Check,
 } from "lucide-react";
 
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Textarea } from "../components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/Input";
+import { Textarea } from "../components/ui/Textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/Avatar";
 import {
     Card,
     CardContent,
     CardHeader,
     CardTitle,
-} from "../components/ui/card";
-import { Badge } from "../components/ui/badge";
-import { Separator } from "../components/ui/separator";
+} from "../components/ui/Card";
+import { Badge } from "../components/ui/Badge";
+import { Separator } from "../components/ui/Separator";
 import {
     Dialog,
     DialogContent,
@@ -36,10 +36,10 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from "../components/ui/dialog";
-import { Label } from "../components/ui/label";
-import { Tabs } from "../components/ui/tabs";
-import { VideoCard } from "../components/video-card";
+} from "../components/ui/Dialog";
+import { Label } from "../components/ui/Label";
+import { Tabs } from "../components/ui/Tabs";
+import { VideoCard } from "../components/VideoCard";
 import { PlaylistCard } from "../components/PlaylistCard";
 import { useToast } from "../hooks/use-toast";
 import { useGetUserPlaylistsQuery } from "../features/playlist/playlistsApiSlice";

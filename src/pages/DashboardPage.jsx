@@ -16,18 +16,18 @@ import {
     Share2,
     MoreHorizontal,
 } from "lucide-react";
-import { Button } from "../components/ui/button";
+import { Button } from "../components/ui/Button";
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "../components/ui/card";
-import { Badge } from "../components/ui/badge";
-import { Avatar, AvatarFallback } from "../components/ui/avatar";
-import { Progress } from "../components/ui/progress";
-import { Tabs } from "../components/ui/tabs";
+} from "../components/ui/Card";
+import { Badge } from "../components/ui/Badge";
+import { Avatar, AvatarFallback } from "../components/ui/Avatar";
+import { Progress } from "../components/ui/Progress";
+import { Tabs } from "../components/ui/Tabs";
 const TabsList = Tabs.List;
 const TabsTrigger = Tabs.Trigger;
 const TabsContent = Tabs.Content;
@@ -37,15 +37,15 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "../components/ui/select";
+} from "../components/ui/Select";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu";
-import { VideoCard } from "../components/video-card";
-import { LoadingSpinner } from "../components/ui/loading-spinner";
+} from "../components/ui/DropdownMenu";
+import { VideoCard } from "../components/VideoCard";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { useSelector } from "react-redux";
 import { useGetAllVideosOfUserQuery } from "../features/videos/videosApiSlice";
 import { timeAgo } from "../utils/timeFormats";

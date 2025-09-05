@@ -65,7 +65,7 @@
 
 @layer components {
     /* Video card components */
-    .video-card-gradient {
+    .VideoCard-gradient {
         background: linear-gradient(
             to bottom,
             rgba(241, 245, 249, 0.5),
@@ -73,7 +73,7 @@
         );
     }
 
-    .dark .video-card-gradient {
+    .dark .VideoCard-gradient {
         background: linear-gradient(
             to bottom,
             rgba(30, 41, 59, 0.5),
