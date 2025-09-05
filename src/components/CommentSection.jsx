@@ -6,10 +6,10 @@ import {
 } from "../features/comments/videoCommentsApiSlice";
 import { useParams } from "react-router-dom";
 import { setCurrentVideoComments } from "../features/comments/commentSlice";
-import { Textarea } from "../components/ui/Textarea";
+import { Textarea } from "@/components/ui/Textarea";
 import { ThumbsUp, ThumbsDown, Send } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/Avatar";
-import { Button } from "../components/ui/Button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
 import { timeAgo } from "../utils/timeFormats";
 import { useToast } from "../hooks/use-toast";
 import CommentItem from "./CommentItem";

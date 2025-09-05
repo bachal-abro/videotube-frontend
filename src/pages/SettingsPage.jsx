@@ -23,31 +23,31 @@ import {
     Trash2,
     AlertTriangle,
 } from "lucide-react";
-import { Button } from "../components/ui/Button";
-import { Input } from "../components/ui/Input";
-import { Textarea } from "../components/ui/Textarea";
-import { Label } from "../components/ui/Label";
-import { Switch } from "../components/ui/Switch";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
+import { Label } from "@/components/ui/Label";
+import { Switch } from "@/components/ui/Switch";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "../components/ui/Select";
+} from "@/components/ui/Select";
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "../components/ui/Card";
-import { Tabs } from "../components/ui/Tabs";
+} from "@/components/ui/Card";
+import { Tabs } from "@/components/ui/Tabs";
 const TabsList = Tabs.List;
 const TabsTrigger = Tabs.Trigger;
 const TabsContent = Tabs.Content;
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/Avatar";
-import { Separator } from "../components/ui/Separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
+import { Separator } from "@/components/ui/Separator";
 import {
     Dialog,
     DialogContent,
@@ -55,11 +55,11 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from "../components/ui/Dialog";
-import { Alert, AlertDescription } from "../components/ui/Alert";
+} from "@/components/ui/Dialog";
+import { Alert, AlertDescription } from "@/components/ui/Alert";
 import { useToast } from "../hooks/use-toast";
 import { useSelector, useDispatch } from "react-redux";
-import { useTheme } from "../components/ThemeProvider";
+import { useTheme } from "@/components/ThemeProvider";
 
 export default function SettingsPage() {
     const navigate = useNavigate();

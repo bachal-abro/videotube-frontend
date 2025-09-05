@@ -12,16 +12,16 @@ import {
     BarChart3,
 } from "lucide-react";
 
-import { Button } from "../components/ui/Button";
-import { Input } from "../components/ui/Input";
-import { Badge } from "../components/ui/Badge";
-import { Card, CardContent } from "../components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Badge } from "@/components/ui/Badge";
+import { Card, CardContent } from "@/components/ui/Card";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "../components/ui/DropdownMenu";
+} from "@/components/ui/DropdownMenu";
 import { useToast } from "../hooks/use-toast";
 import {
     useDeleteVideoMutation,

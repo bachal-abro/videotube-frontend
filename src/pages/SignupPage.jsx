@@ -11,19 +11,19 @@ import {
     Check,
     X,
 } from "lucide-react";
-import { Button } from "../components/ui/Button";
-import { Input } from "../components/ui/Input";
-import { Label } from "../components/ui/Label";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "../components/ui/Card";
-import { Checkbox } from "../components/ui/Checkbox";
-import { Progress } from "../components/ui/Progress";
-import { Separator } from "../components/ui/Separator";
+} from "@/components/ui/Card";
+import { Checkbox } from "@/components/ui/Checkbox";
+import { Progress } from "@/components/ui/Progress";
+import { Separator } from "@/components/ui/Separator";
 import { useToast } from "../hooks/use-toast";
 import { useSelector, useDispatch } from "react-redux";
 import { useRegisterMutation } from "../features/auth/authApiSlice";

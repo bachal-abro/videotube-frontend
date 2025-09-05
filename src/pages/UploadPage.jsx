@@ -16,19 +16,19 @@ import {
     Loader2,
 } from "lucide-react";
 
-import { Button } from "../components/ui/Button";
-import { Input } from "../components/ui/Input";
-import { Textarea } from "../components/ui/Textarea";
-import { Label } from "../components/ui/Label";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
+import { Label } from "@/components/ui/Label";
 import {
     Card,
     CardContent,
     CardHeader,
     CardTitle,
-} from "../components/ui/Card";
-import { Progress } from "../components/ui/Progress";
-import { Badge } from "../components/ui/Badge";
-import { Separator } from "../components/ui/Separator";
+} from "@/components/ui/Card";
+import { Progress } from "@/components/ui/Progress";
+import { Badge } from "@/components/ui/Badge";
+import { Separator } from "@/components/ui/Separator";
 import { useToast } from "../hooks/use-toast";
 import { cn } from "../lib/utils";
 import { useUploadVideoMutation } from "../features/videos/videosApiSlice";

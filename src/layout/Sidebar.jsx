@@ -23,7 +23,7 @@ import {
     ListVideo,
 } from "lucide-react";
 import { cn } from "../lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/Avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
 import { useDispatch, useSelector } from "react-redux";
 import { setSidebarOpen } from "../features/system/systemSlice";
 import { useGetSubscribedChannelsQuery } from "../features/subscription/subscriptionApiSlice";

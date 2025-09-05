@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
-import { PlaylistCard } from "../components/PlaylistCard";
-import { CreatePlaylistDialog } from "../components/CreatePlaylistDialog";
-import { Input } from "../components/ui/Input";
-import { Button } from "../components/ui/Button";
+import { PlaylistCard } from "@/components/PlaylistCard";
+import { CreatePlaylistDialog } from "@/components/CreatePlaylistDialog";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 import { Search, Plus, X } from "lucide-react";
 import {
     useDeletePlaylistMutation,

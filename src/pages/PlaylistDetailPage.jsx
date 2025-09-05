@@ -12,17 +12,17 @@ import {
     X,
 } from "lucide-react";
 
-import { Button } from "../components/ui/Button";
-import { Input } from "../components/ui/Input";
-import { PlaylistVideoCard } from "../components/PlaylistVideoCard";
-import { AddToPlaylistDialog } from "../components/AddToPlaylistDialog";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { PlaylistVideoCard } from "@/components/PlaylistVideoCard";
+import { AddToPlaylistDialog } from "@/components/AddToPlaylistDialog";
 import { videosData } from "../data/videos";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "../components/ui/DropdownMenu";
+} from "@/components/ui/DropdownMenu";
 import {
     Dialog,
     DialogContent,
@@ -30,8 +30,8 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from "../components/ui/Dialog";
-import { Label } from "../components/ui/Label";
+} from "@/components/ui/Dialog";
+import { Label } from "@/components/ui/Label";
 import { useToast } from "../hooks/use-toast";
 import {
     useDeletePlaylistMutation,

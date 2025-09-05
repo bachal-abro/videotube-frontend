@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
-import { HistoryVideoCard } from "../components/HistoryVideoCard";
-import { Input } from "../components/ui/Input";
-import { Button } from "../components/ui/Button";
+import { HistoryVideoCard } from "@/components/HistoryVideoCard";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 import {
     Search,
     X,

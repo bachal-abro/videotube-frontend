@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
-import { WatchLaterVideoCard } from "../components/WatchLaterVideoCard";
+import { WatchLaterVideoCard } from "@/components/WatchLaterVideoCard";
 import { videosData } from "../data/videos";
-import { Input } from "../components/ui/Input";
-import { Button } from "../components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 import { Search, X, Trash2 } from "lucide-react";
 
 export default function WatchLaterPage() {

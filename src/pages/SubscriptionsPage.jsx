@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { VideoCard } from "../components/VideoCard";
+import { VideoCard } from "@/components/VideoCard";
 import { setSubscriptionFeed } from "../features/videos/videoSlice";
 import { useGetVideosFromSubscriptionsQuery } from "../features/videos/videosApiSlice";
 import { timeAgo } from "../utils/timeFormats";
